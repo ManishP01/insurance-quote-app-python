@@ -1,0 +1,273 @@
+{% extends "base.html" %}
+
+{% block title %}Report a Claim - Simple FNOL{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="hero-section">
+        <h1><i class="fas fa-headset"></i> Report Your Claim</h1>
+        <p class="hero-subtitle">Simple AI Claims Assistant - Available 24/7</p>
+    </div>
+
+    <!-- Simple FNOL Interface -->
+    <div class="card">
+        <div class="agent-header" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 2rem; border-radius: 15px 15px 0 0; text-align: center;">
+            <div class="agent-avatar" style="width: 80px; height: 80px; border-radius: 50%; background: rgba(255,255,255,0.2); margin: 0 auto 1rem; display: flex; align-items: center; justify-content: center;">
+                <i class="fas fa-user-tie" style="font-size: 2rem;"></i>
+            </div>
+            <h2 style="margin: 0;">Claims Assistant Sarah</h2>
+            <p style="margin: 0.5rem 0 0; opacity: 0.9;">I'm here to help you through this difficult time</p>
+        </div>
+
+        <!-- Simple Test Section -->
+        <div style="padding: 2rem;">
+            <h3>🧪 Test Basic Functions</h3>
+            
+            <div style="margin: 2rem 0;">
+                <button id="test-basic" class="btn btn-large" style="background: #3498db;">
+                    <i class="fas fa-play"></i> Test JavaScript
+                </button>
+                
+                <button id="test-speech" class="btn btn-large" style="background: #e74c3c;">
+                    <i class="fas fa-microphone"></i> Test Speech Recognition
+                </button>
+                
+                <button id="test-tts" class="btn btn-large" style="background: #27ae60;">
+                    <i class="fas fa-volume-up"></i> Test Text-to-Speech
+                </button>
+            </div>
+            
+            <div id="test-results" style="padding: 1rem; background: #f8f9fa; border-radius: 5px; margin-top: 1rem; min-height: 100px;">
+                <strong>Test results will appear here...</strong>
+            </div>
+        </div>
+
+        <!-- Simple Speech Interface -->
+        <div style="padding: 2rem; border-top: 1px solid #e9ecef;">
+            <h3>🎙️ Simple Speech Test</h3>
+            
+            <div style="text-align: center; margin: 2rem 0;">
+                <button id="start-simple" class="btn btn-large" style="background: linear-gradient(45deg, #e74c3c, #c0392b);">
+                    <i class="fas fa-microphone"></i> Start Speaking
+                </button>
+                
+                <button id="stop-simple" class="btn btn-large" style="background: #95a5a6; display: none;">
+                    <i class="fas fa-stop"></i> Stop
+                </button>
+            </div>
+            
+            <div id="simple-transcript" style="padding: 1rem; background: white; border: 2px solid #e9ecef; border-radius: 5px; min-height: 80px;">
+                <em>Your speech will appear here...</em>
+            </div>
+            
+            <div id="sarah-response" style="padding: 1rem; background: rgba(102, 126, 234, 0.1); border-radius: 5px; margin-top: 1rem; min-height: 80px; display: none;">
+                <strong>Sarah:</strong> <span id="response-text"></span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+console.log('🚀 Simple FNOL script loading...');
+
+// Global variables
+let recognition = null;
+let isListening = false;
+
+// Test functions
+function testBasic() {
+    console.log('✅ JavaScript is working!');
+    document.getElementById('test-results').innerHTML = '✅ JavaScript is working!<br>';
+    
+    // Test browser features
+    let results = '✅ JavaScript is working!<br>';
+    
+    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+        results += '✅ Speech Recognition supported<br>';
+    } else {
+        results += '❌ Speech Recognition NOT supported<br>';
+    }
+    
+    if ('speechSynthesis' in window) {
+        results += '✅ Text-to-Speech supported<br>';
+    } else {
+        results += '❌ Text-to-Speech NOT supported<br>';
+    }
+    
+    document.getElementById('test-results').innerHTML = results;
+}
+
+function testSpeech() {
+    console.log('🎙️ Testing speech recognition...');
+    
+    if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+        alert('Speech recognition not supported in this browser');
+        return;
+    }
+    
+    try {
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        const testRecognition = new SpeechRecognition();
+        
+        testRecognition.onstart = () => {
+            console.log('🎙️ Speech recognition started');
+            document.getElementById('test-results').innerHTML = '🎙️ Speech recognition started - say something!';
+        };
+        
+        testRecognition.onresult = (event) => {
+            const transcript = event.results[0][0].transcript;
+            console.log('📝 Heard:', transcript);
+            document.getElementById('test-results').innerHTML = `📝 You said: "${transcript}"`;
+        };
+        
+        testRecognition.onerror = (event) => {
+            console.error('❌ Speech error:', event.error);
+            document.getElementById('test-results').innerHTML = `❌ Speech error: ${event.error}`;
+        };
+        
+        testRecognition.start();
+        
+    } catch (error) {
+        console.error('❌ Error:', error);
+        document.getElementById('test-results').innerHTML = `❌ Error: ${error.message}`;
+    }
+}
+
+function testTTS() {
+    console.log('🔊 Testing text-to-speech...');
+    
+    if (!('speechSynthesis' in window)) {
+        alert('Text-to-speech not supported in this browser');
+        return;
+    }
+    
+    const utterance = new SpeechSynthesisUtterance('Hello! This is Sarah, your AI Claims Assistant. Text to speech is working correctly.');
+    
+    utterance.onstart = () => {
+        console.log('🔊 Speech started');
+        document.getElementById('test-results').innerHTML = '🔊 Sarah is speaking...';
+    };
+    
+    utterance.onend = () => {
+        console.log('✅ Speech completed');
+        document.getElementById('test-results').innerHTML = '✅ Text-to-speech test completed!';
+    };
+    
+    speechSynthesis.speak(utterance);
+}
+
+function startSimpleSpeech() {
+    console.log('🎙️ Starting simple speech...');
+    
+    if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+        alert('Speech recognition not supported in this browser. Please use Chrome or Safari.');
+        return;
+    }
+    
+    try {
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        recognition = new SpeechRecognition();
+        
+        recognition.continuous = true;
+        recognition.interimResults = true;
+        recognition.lang = 'en-US';
+        
+        recognition.onstart = () => {
+            console.log('🎙️ Listening started');
+            isListening = true;
+            document.getElementById('start-simple').style.display = 'none';
+            document.getElementById('stop-simple').style.display = 'inline-block';
+            document.getElementById('simple-transcript').innerHTML = '<em>Listening... speak now!</em>';
+        };
+        
+        recognition.onresult = (event) => {
+            let transcript = '';
+            for (let i = event.resultIndex; i < event.results.length; i++) {
+                transcript += event.results[i][0].transcript;
+            }
+            
+            console.log('📝 Transcript:', transcript);
+            document.getElementById('simple-transcript').innerHTML = transcript;
+            
+            // Simple AI response
+            if (event.results[event.results.length - 1].isFinal) {
+                generateSimpleResponse(transcript);
+            }
+        };
+        
+        recognition.onerror = (event) => {
+            console.error('❌ Speech error:', event.error);
+            document.getElementById('simple-transcript').innerHTML = `❌ Error: ${event.error}`;
+            resetButtons();
+        };
+        
+        recognition.onend = () => {
+            console.log('🛑 Speech ended');
+            resetButtons();
+        };
+        
+        recognition.start();
+        
+    } catch (error) {
+        console.error('❌ Error starting speech:', error);
+        alert('Error starting speech recognition: ' + error.message);
+    }
+}
+
+function stopSimpleSpeech() {
+    console.log('🛑 Stopping speech...');
+    if (recognition && isListening) {
+        recognition.stop();
+    }
+}
+
+function resetButtons() {
+    document.getElementById('start-simple').style.display = 'inline-block';
+    document.getElementById('stop-simple').style.display = 'none';
+    isListening = false;
+}
+
+function generateSimpleResponse(userInput) {
+    console.log('🤖 Generating response for:', userInput);
+    
+    const lowerInput = userInput.toLowerCase();
+    let response = '';
+    
+    if (lowerInput.includes('accident') || lowerInput.includes('crash')) {
+        response = "I'm so sorry to hear about your accident. That must have been very frightening. Can you tell me when this happened and if anyone was injured?";
+    } else if (lowerInput.includes('theft') || lowerInput.includes('stolen')) {
+        response = "I understand how upsetting it is to have your property stolen. When did you discover the theft, and have you contacted the police?";
+    } else if (lowerInput.includes('fire')) {
+        response = "A fire can be devastating. I'm glad you're safe. When did this fire occur, and did the fire department respond?";
+    } else if (lowerInput.includes('water') || lowerInput.includes('flood')) {
+        response = "Water damage needs immediate attention. When did this happen, and what was the source of the water?";
+    } else {
+        response = "Thank you for telling me what happened. Can you provide more details about the type of incident - was it an accident, theft, fire, or something else?";
+    }
+    
+    // Show response
+    document.getElementById('sarah-response').style.display = 'block';
+    document.getElementById('response-text').textContent = response;
+    
+    // Speak response
+    if ('speechSynthesis' in window) {
+        const utterance = new SpeechSynthesisUtterance(response);
+        speechSynthesis.speak(utterance);
+    }
+}
+
+// Initialize when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('📄 Simple FNOL page loaded');
+    
+    // Add event listeners
+    document.getElementById('test-basic').addEventListener('click', testBasic);
+    document.getElementById('test-speech').addEventListener('click', testSpeech);
+    document.getElementById('test-tts').addEventListener('click', testTTS);
+    document.getElementById('start-simple').addEventListener('click', startSimpleSpeech);
+    document.getElementById('stop-simple').addEventListener('click', stopSimpleSpeech);
+    
+    console.log('✅ Simple FNOL initialized');
+});
+</script>
+{% endblock %}

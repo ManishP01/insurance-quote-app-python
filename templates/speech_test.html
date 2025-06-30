@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Speech Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        button { padding: 15px 25px; margin: 10px; font-size: 16px; cursor: pointer; }
+        .btn-red { background: #e74c3c; color: white; border: none; border-radius: 5px; }
+        .btn-green { background: #27ae60; color: white; border: none; border-radius: 5px; }
+        .btn-blue { background: #3498db; color: white; border: none; border-radius: 5px; }
+        #output { padding: 20px; background: #f8f9fa; border: 1px solid #ddd; margin: 20px 0; min-height: 100px; }
+    </style>
+</head>
+<body>
+    <h1>🎙️ Simple Speech Test</h1>
+    
+    <button class="btn-blue" onclick="testBasic()">Test JavaScript</button>
+    <button class="btn-red" onclick="startSpeech()">Start Speech</button>
+    <button class="btn-green" onclick="testTTS()">Test Speech</button>
+    
+    <div id="output">Click "Test JavaScript" first...</div>
+    
+    <script>
+        let recognition = null;
+        
+        function log(message) {
+            document.getElementById('output').innerHTML += message + '<br>';
+            console.log(message);
+        }
+        
+        function testBasic() {
+            document.getElementById('output').innerHTML = '';
+            log('✅ JavaScript is working!');
+            
+            if ('webkitSpeechRecognition' in window) {
+                log('✅ webkitSpeechRecognition available');
+            } else if ('SpeechRecognition' in window) {
+                log('✅ SpeechRecognition available');
+            } else {
+                log('❌ Speech Recognition NOT available');
+            }
+            
+            if ('speechSynthesis' in window) {
+                log('✅ Text-to-Speech available');
+            } else {
+                log('❌ Text-to-Speech NOT available');
+            }
+        }
+        
+        function startSpeech() {
+            log('🎙️ Starting speech recognition...');
+            
+            if (!window.webkitSpeechRecognition && !window.SpeechRecognition) {
+                log('❌ Speech recognition not supported');
+                return;
+            }
+            
+            try {
+                const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                recognition = new SpeechRecognition();
+                
+                recognition.onstart = () => log('🎙️ Listening... speak now!');
+                recognition.onresult = (event) => {
+                    const transcript = event.results[0][0].transcript;
+                    log('📝 You said: "' + transcript + '"');
+                };
+                recognition.onerror = (event) => log('❌ Error: ' + event.error);
+                recognition.onend = () => log('🛑 Speech recognition ended');
+                
+                recognition.start();
+                
+            } catch (error) {
+                log('❌ Exception: ' + error.message);
+            }
+        }
+        
+        function testTTS() {
+            log('🔊 Testing text-to-speech...');
+            
+            if (!window.speechSynthesis) {
+                log('❌ Text-to-speech not supported');
+                return;
+            }
+            
+            const utterance = new SpeechSynthesisUtterance('Hello! This is a test of text to speech.');
+            utterance.onstart = () => log('🔊 Speaking...');
+            utterance.onend = () => log('✅ Speech completed');
+            
+            speechSynthesis.speak(utterance);
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,490 @@
+{% extends "base.html" %}
+
+{% block title %}Report a Claim - FNOL{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="hero-section">
+        <h1><i class="fas fa-headset"></i> Report Your Claim</h1>
+        <p class="hero-subtitle">AI Claims Assistant Sarah - Available 24/7</p>
+    </div>
+
+    <!-- Working FNOL Interface -->
+    <div class="card">
+        <div class="agent-header" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 2rem; border-radius: 15px 15px 0 0; text-align: center;">
+            <div class="agent-avatar" style="width: 80px; height: 80px; border-radius: 50%; background: rgba(255,255,255,0.2); margin: 0 auto 1rem; display: flex; align-items: center; justify-content: center;">
+                <i class="fas fa-user-tie" style="font-size: 2rem;"></i>
+            </div>
+            <h2 style="margin: 0;">Claims Assistant Sarah</h2>
+            <p style="margin: 0.5rem 0 0; opacity: 0.9;">I'm here to help you through this difficult time</p>
+        </div>
+
+        <!-- Conversation Area -->
+        <div id="conversation-area" style="padding: 2rem; max-height: 400px; overflow-y: auto; background: #f8f9fa;">
+            <div class="message agent-message" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; margin-right: 20%; padding: 1rem; border-radius: 10px; margin-bottom: 1rem;">
+                <div class="message-content">
+                    <strong>Sarah:</strong> Hello, I'm Sarah, your AI Claims Assistant. I'm here to help you report your claim and guide you through this process. I understand this might be a stressful time, and I'm here to make this as easy as possible for you.
+                    <br><br>
+                    To get started, could you please tell me what happened? Take your time, and speak naturally - I'll listen carefully.
+                </div>
+                <div class="message-time" style="font-size: 0.8rem; opacity: 0.7; margin-top: 0.5rem;">Just now</div>
+            </div>
+        </div>
+
+        <!-- Voice Controls -->
+        <div class="voice-controls" style="padding: 2rem; border-top: 1px solid #e9ecef;">
+            <div class="recording-status" id="recording-status" style="text-align: center; margin-bottom: 1rem;">
+                <div id="status-indicator" class="status-ready" style="color: #27ae60; font-size: 1.2rem;">
+                    <i class="fas fa-microphone"></i>
+                    <span>Ready to listen</span>
+                </div>
+            </div>
+
+            <div class="control-buttons" style="display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap;">
+                <button id="start-recording" class="btn btn-large" style="background: linear-gradient(45deg, #e74c3c, #c0392b);">
+                    <i class="fas fa-microphone"></i> Start Speaking
+                </button>
+                <button id="stop-recording" class="btn btn-large" style="background: linear-gradient(45deg, #95a5a6, #7f8c8d); display: none;">
+                    <i class="fas fa-stop"></i> Stop Recording
+                </button>
+                <button id="mute-sarah" class="btn btn-secondary">
+                    <i class="fas fa-volume-up"></i> Mute Sarah
+                </button>
+            </div>
+
+            <!-- Live Transcript -->
+            <div id="live-transcript" style="display: none; padding: 1rem; background: rgba(52, 152, 219, 0.1); border-radius: 10px; margin: 1rem 0;">
+                <h4><i class="fas fa-closed-captioning"></i> Live Transcript:</h4>
+                <div id="transcript-text" style="font-style: italic; color: #2c3e50; min-height: 50px; padding: 1rem; background: white; border-radius: 5px; border-left: 4px solid #3498db;">
+                    Listening...
+                </div>
+            </div>
+            
+            <!-- Sarah Speaking Indicator -->
+            <div id="sarah-speaking" style="display: none; text-align: center; margin-top: 1rem; padding: 1rem; background: rgba(102, 126, 234, 0.1); border-radius: 10px;">
+                <div style="display: flex; align-items: center; justify-content: center; gap: 1rem;">
+                    <div class="speaking-animation" style="width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center; animation: pulse 1.5s infinite;">
+                        <i class="fas fa-volume-up" style="color: white;"></i>
+                    </div>
+                    <span style="font-weight: bold; color: #667eea;">Sarah is speaking...</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Claim Summary -->
+    <div id="claim-summary" class="card" style="display: none;">
+        <h3><i class="fas fa-clipboard-list"></i> Claim Summary</h3>
+        <div id="extracted-info">
+            <!-- Dynamically populated claim information -->
+        </div>
+        
+        <div class="summary-actions" style="margin-top: 2rem; text-align: center;">
+            <button id="submit-claim" class="btn btn-large" style="background: linear-gradient(45deg, #27ae60, #229954);">
+                <i class="fas fa-paper-plane"></i> Submit Claim
+            </button>
+        </div>
+    </div>
+</div>
+
+<style>
+@keyframes pulse {
+    0% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.7; transform: scale(1.05); }
+    100% { opacity: 1; transform: scale(1); }
+}
+
+.status-ready {
+    color: #27ae60;
+    font-size: 1.2rem;
+}
+
+.status-listening {
+    color: #e74c3c;
+    font-size: 1.2rem;
+    animation: pulse 1.5s infinite;
+}
+
+.status-processing {
+    color: #f39c12;
+    font-size: 1.2rem;
+}
+
+.user-message {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    color: white;
+    margin-left: 20%;
+    padding: 1rem;
+    border-radius: 10px;
+    margin-bottom: 1rem;
+}
+</style>
+
+<script>
+console.log('🚀 Working FNOL Agent loading...');
+
+class WorkingFNOLAgent {
+    constructor() {
+        this.recognition = null;
+        this.isRecording = false;
+        this.isMuted = false;
+        this.conversation = [];
+        this.claimData = {};
+        this.currentTranscript = '';
+        
+        this.initializeSpeechRecognition();
+        this.initializeTextToSpeech();
+        this.initializeEventListeners();
+        this.speakWelcome();
+    }
+    
+    initializeSpeechRecognition() {
+        console.log('🎙️ Initializing speech recognition...');
+        
+        if ('webkitSpeechRecognition' in window) {
+            this.recognition = new webkitSpeechRecognition();
+        } else if ('SpeechRecognition' in window) {
+            this.recognition = new SpeechRecognition();
+        } else {
+            console.warn('❌ Speech recognition not supported');
+            return;
+        }
+        
+        // Optimized settings for better audio quality
+        this.recognition.continuous = false; // Changed to false for better control
+        this.recognition.interimResults = true;
+        this.recognition.lang = 'en-US';
+        this.recognition.maxAlternatives = 1;
+        
+        this.recognition.onstart = () => {
+            console.log('🎙️ Speech recognition started');
+            this.updateStatus('listening', 'Listening... speak clearly');
+            document.getElementById('live-transcript').style.display = 'block';
+            document.getElementById('start-recording').style.display = 'none';
+            document.getElementById('stop-recording').style.display = 'inline-block';
+        };
+        
+        this.recognition.onresult = (event) => {
+            let interimTranscript = '';
+            let finalTranscript = '';
+            
+            for (let i = event.resultIndex; i < event.results.length; i++) {
+                const transcript = event.results[i][0].transcript;
+                if (event.results[i].isFinal) {
+                    finalTranscript += transcript;
+                } else {
+                    interimTranscript += transcript;
+                }
+            }
+            
+            document.getElementById('transcript-text').innerHTML = 
+                finalTranscript + '<span style="opacity: 0.5;">' + interimTranscript + '</span>';
+            
+            if (finalTranscript) {
+                this.currentTranscript = finalTranscript.trim();
+                console.log('📝 Final transcript:', this.currentTranscript);
+            }
+        };
+        
+        this.recognition.onerror = (event) => {
+            console.error('❌ Speech recognition error:', event.error);
+            this.updateStatus('ready', 'Error: ' + event.error + '. Ready to try again.');
+            this.resetRecording();
+        };
+        
+        this.recognition.onend = () => {
+            console.log('🛑 Speech recognition ended');
+            this.resetRecording();
+            
+            if (this.currentTranscript) {
+                this.processUserInput(this.currentTranscript);
+                this.currentTranscript = '';
+            }
+        };
+    }
+    
+    initializeTextToSpeech() {
+        // Wait for voices to load
+        if (speechSynthesis.getVoices().length === 0) {
+            speechSynthesis.addEventListener('voiceschanged', () => {
+                this.selectBestVoice();
+            });
+        } else {
+            this.selectBestVoice();
+        }
+    }
+    
+    selectBestVoice() {
+        const voices = speechSynthesis.getVoices();
+        
+        // Prefer high-quality female voices
+        const preferredVoices = [
+            'Samantha', 'Karen', 'Victoria', 'Susan', 'Allison', // macOS
+            'Microsoft Zira', 'Microsoft Hazel', // Windows
+            'Google UK English Female', 'Google US English Female' // Chrome
+        ];
+        
+        for (const voiceName of preferredVoices) {
+            const voice = voices.find(v => v.name.includes(voiceName));
+            if (voice) {
+                this.sarahVoice = voice;
+                console.log('🗣️ Selected voice:', voice.name);
+                return;
+            }
+        }
+        
+        // Fallback to any female voice
+        const femaleVoice = voices.find(v => 
+            v.name.toLowerCase().includes('female') || 
+            v.name.toLowerCase().includes('woman')
+        );
+        
+        this.sarahVoice = femaleVoice || voices[0];
+        console.log('🗣️ Using voice:', this.sarahVoice?.name || 'Default');
+    }
+    
+    initializeEventListeners() {
+        document.getElementById('start-recording').addEventListener('click', () => {
+            this.startRecording();
+        });
+        
+        document.getElementById('stop-recording').addEventListener('click', () => {
+            this.stopRecording();
+        });
+        
+        document.getElementById('mute-sarah').addEventListener('click', () => {
+            this.toggleMute();
+        });
+        
+        document.getElementById('submit-claim').addEventListener('click', () => {
+            this.submitClaim();
+        });
+    }
+    
+    speakWelcome() {
+        // Speak the welcome message after a short delay
+        setTimeout(() => {
+            this.speakMessage("Hello, I'm Sarah, your AI Claims Assistant. I'm here to help you report your claim. Please click 'Start Speaking' when you're ready to tell me what happened.");
+        }, 1000);
+    }
+    
+    startRecording() {
+        console.log('🎙️ Starting recording...');
+        
+        if (!this.recognition) {
+            alert('Speech recognition not supported in this browser. Please use Chrome or Safari.');
+            return;
+        }
+        
+        try {
+            this.isRecording = true;
+            this.recognition.start();
+        } catch (error) {
+            console.error('❌ Error starting recording:', error);
+            alert('Error starting speech recognition: ' + error.message);
+            this.resetRecording();
+        }
+    }
+    
+    stopRecording() {
+        console.log('🛑 Stopping recording...');
+        if (this.recognition && this.isRecording) {
+            this.recognition.stop();
+        }
+    }
+    
+    resetRecording() {
+        this.isRecording = false;
+        document.getElementById('start-recording').style.display = 'inline-block';
+        document.getElementById('stop-recording').style.display = 'none';
+        document.getElementById('live-transcript').style.display = 'none';
+        this.updateStatus('ready', 'Ready to listen');
+    }
+    
+    updateStatus(status, message) {
+        const indicator = document.getElementById('status-indicator');
+        indicator.className = `status-${status}`;
+        indicator.innerHTML = `<i class="fas fa-microphone"></i> <span>${message}</span>`;
+    }
+    
+    speakMessage(message) {
+        if (this.isMuted) return;
+        
+        // Stop any current speech
+        speechSynthesis.cancel();
+        
+        const utterance = new SpeechSynthesisUtterance(message);
+        
+        if (this.sarahVoice) {
+            utterance.voice = this.sarahVoice;
+        }
+        
+        // Optimized settings for clearer speech
+        utterance.rate = 0.85; // Slightly slower for clarity
+        utterance.pitch = 1.0;
+        utterance.volume = 0.7; // Reduced volume to minimize feedback
+        
+        // Show speaking indicator
+        document.getElementById('sarah-speaking').style.display = 'block';
+        
+        utterance.onend = () => {
+            document.getElementById('sarah-speaking').style.display = 'none';
+        };
+        
+        utterance.onerror = (event) => {
+            console.error('🔊 Speech synthesis error:', event);
+            document.getElementById('sarah-speaking').style.display = 'none';
+        };
+        
+        speechSynthesis.speak(utterance);
+    }
+    
+    toggleMute() {
+        this.isMuted = !this.isMuted;
+        const button = document.getElementById('mute-sarah');
+        
+        if (this.isMuted) {
+            button.innerHTML = '<i class="fas fa-volume-mute"></i> Unmute Sarah';
+            speechSynthesis.cancel();
+        } else {
+            button.innerHTML = '<i class="fas fa-volume-up"></i> Mute Sarah';
+        }
+    }
+    
+    async processUserInput(userInput) {
+        console.log('🤖 Processing user input:', userInput);
+        
+        // Add user message to conversation
+        this.addMessage('user', userInput);
+        
+        // Generate intelligent response
+        const response = this.generateIntelligentResponse(userInput);
+        
+        // Add AI response to conversation
+        this.addMessage('agent', response.message);
+        
+        // Speak the response
+        this.speakMessage(response.message);
+        
+        // Update claim data
+        if (response.extractedData) {
+            Object.assign(this.claimData, response.extractedData);
+            this.updateClaimSummary();
+        }
+    }
+    
+    generateIntelligentResponse(input) {
+        const lowerInput = input.toLowerCase();
+        
+        if (lowerInput.includes('accident') || lowerInput.includes('crash') || lowerInput.includes('collision')) {
+            return {
+                message: "I'm so sorry to hear about your accident. That must have been very frightening. Let me gather some important details to help you. When did this accident occur, and where did it happen?",
+                extractedData: { incidentType: 'Vehicle Accident', description: input }
+            };
+        } else if (lowerInput.includes('theft') || lowerInput.includes('stolen') || lowerInput.includes('burglar')) {
+            return {
+                message: "I understand how violating it feels to have your property stolen. This is serious and we'll get this reported right away. When did you discover the theft, and have you contacted the police?",
+                extractedData: { incidentType: 'Theft/Burglary', description: input }
+            };
+        } else if (lowerInput.includes('fire') || lowerInput.includes('smoke') || lowerInput.includes('burn')) {
+            return {
+                message: "A fire can be absolutely devastating. I'm so glad you're safe. When did this fire occur, and did the fire department respond? What areas of your property were affected?",
+                extractedData: { incidentType: 'Fire Damage', description: input }
+            };
+        } else if (lowerInput.includes('water') || lowerInput.includes('flood') || lowerInput.includes('leak')) {
+            return {
+                message: "Water damage needs immediate attention. When did this happen, and what was the source of the water? Have you been able to stop the water flow?",
+                extractedData: { incidentType: 'Water Damage', description: input }
+            };
+        } else {
+            return {
+                message: "Thank you for sharing that information. To make sure I can help you properly, could you tell me more about what type of incident this was? For example, was it a car accident, theft, fire, water damage, or something else?",
+                extractedData: { initialDescription: input }
+            };
+        }
+    }
+    
+    addMessage(sender, content) {
+        const conversationArea = document.getElementById('conversation-area');
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `message ${sender}-message`;
+        
+        const now = new Date().toLocaleTimeString();
+        messageDiv.innerHTML = `
+            <div class="message-content">
+                <strong>${sender === 'agent' ? 'Sarah' : 'You'}:</strong> ${content}
+            </div>
+            <div class="message-time">${now}</div>
+        `;
+        
+        conversationArea.appendChild(messageDiv);
+        conversationArea.scrollTop = conversationArea.scrollHeight;
+        
+        // Store in conversation history
+        this.conversation.push({
+            sender: sender,
+            content: content,
+            timestamp: now
+        });
+    }
+    
+    updateClaimSummary() {
+        const summaryDiv = document.getElementById('extracted-info');
+        let summaryHTML = '<div class="claim-info-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem;">';
+        
+        for (const [key, value] of Object.entries(this.claimData)) {
+            summaryHTML += `
+                <div class="info-item" style="padding: 1rem; background: rgba(52, 152, 219, 0.1); border-radius: 8px;">
+                    <strong>${key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}:</strong><br>
+                    ${value}
+                </div>
+            `;
+        }
+        
+        summaryHTML += '</div>';
+        summaryDiv.innerHTML = summaryHTML;
+        
+        document.getElementById('claim-summary').style.display = 'block';
+    }
+    
+    async submitClaim() {
+        const claimSubmission = {
+            claimData: this.claimData,
+            conversation: this.conversation,
+            timestamp: new Date().toISOString()
+        };
+        
+        try {
+            const response = await fetch('/api/submit-fnol', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(claimSubmission)
+            });
+            
+            if (response.ok) {
+                alert('Your claim has been successfully submitted!');
+                window.location.href = '/claim-confirmation';
+            } else {
+                throw new Error('Submission failed');
+            }
+        } catch (error) {
+            console.error('❌ Submission error:', error);
+            alert('There was an error submitting your claim. Please try again.');
+        }
+    }
+}
+
+// Initialize when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('📄 Working FNOL page loaded');
+    
+    try {
+        window.fnolAgent = new WorkingFNOLAgent();
+        console.log('✅ Working FNOL Agent initialized');
+    } catch (error) {
+        console.error('❌ Error initializing FNOL Agent:', error);
+        alert('Error initializing FNOL Agent: ' + error.message);
+    }
+});
+</script>
+{% endblock %}

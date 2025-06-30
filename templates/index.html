@@ -1,0 +1,673 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="stepper">
+    <div class="step active">
+        <i class="fas fa-upload"></i>
+        <span>Upload Policy</span>
+    </div>
+    <div class="step">
+        <i class="fas fa-calculator"></i>
+        <span>Review Quote</span>
+    </div>
+    <div class="step">
+        <i class="fas fa-piggy-bank"></i>
+        <span>Optimize Savings</span>
+    </div>
+</div>
+
+<div class="card">
+    <h2 class="text-center mb-2">Upload Your Current Policy Document</h2>
+    <p class="text-center text-large mb-2">Upload your current insurance policy (PDF) to get an instant competitive quote</p>
+
+    <!-- Benefits Section -->
+    <div class="card" style="background: rgba(52, 152, 219, 0.1); border-left: 4px solid #3498db;">
+        <h3 class="text-center mb-1">Why Choose QuickQuote?</h3>
+        <div class="grid grid-3">
+            <div class="text-center">
+                <i class="fas fa-bolt text-primary" style="font-size: 2rem;"></i>
+                <h4>Instant Analysis</h4>
+                <p>Get quotes in seconds, not hours</p>
+            </div>
+            <div class="text-center">
+                <i class="fas fa-shield-alt text-primary" style="font-size: 2rem;"></i>
+                <h4>Secure Processing</h4>
+                <p>Your documents are processed locally and securely</p>
+            </div>
+            <div class="text-center">
+                <i class="fas fa-piggy-bank text-primary" style="font-size: 2rem;"></i>
+                <h4>Maximum Savings</h4>
+                <p>Discover all available discounts and bundling options</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Upload Area -->
+    <div id="upload-area" class="card" style="border: 2px dashed #bdc3c7; cursor: pointer; transition: all 0.3s ease;">
+        <div class="text-center">
+            <i class="fas fa-cloud-upload-alt" style="font-size: 4rem; color: #3498db; margin-bottom: 1rem;"></i>
+            <h3>Upload Your Policy Document</h3>
+            <p class="text-large mb-1">Choose from your device or take a new photo</p>
+            <p style="color: #7f8c8d; margin-bottom: 1rem;">Supported: PDF, JPG, PNG, HEIC and other image formats</p>
+            
+            <!-- Separate, Clear Options -->
+            <div style="display: flex; justify-content: center; gap: 2rem; flex-wrap: wrap; margin-top: 2rem;">
+                <!-- File Upload Option -->
+                <div class="upload-option" style="text-align: center; padding: 1.5rem; border: 2px solid #3498db; border-radius: 15px; min-width: 200px; cursor: pointer;" onclick="selectFile()">
+                    <i class="fas fa-folder-open" style="font-size: 3rem; color: #3498db; margin-bottom: 1rem;"></i>
+                    <h4 style="margin: 0.5rem 0; color: #3498db;">Choose File</h4>
+                    <p style="margin: 0; color: #7f8c8d; font-size: 0.9rem;">Upload PDF or image from your device</p>
+                </div>
+                
+                <!-- Camera Option -->
+                <div class="upload-option" style="text-align: center; padding: 1.5rem; border: 2px solid #27ae60; border-radius: 15px; min-width: 200px; cursor: pointer;" onclick="openCamera()">
+                    <i class="fas fa-camera" style="font-size: 3rem; color: #27ae60; margin-bottom: 1rem;"></i>
+                    <h4 style="margin: 0.5rem 0; color: #27ae60;">Take Photo</h4>
+                    <p style="margin: 0; color: #7f8c8d; font-size: 0.9rem;">Use your camera to capture document</p>
+                </div>
+            </div>
+            
+            <!-- Hidden file input -->
+            <input type="file" id="file-input" accept=".pdf,.jpg,.jpeg,.png,.bmp,.tiff,.heic,image/*,application/pdf" style="display: none;">
+        </div>
+    </div>
+
+    <!-- Enhanced Loading State with Progress -->
+    <div class="loading" style="display: none;">
+        <div class="card" style="text-align: center; padding: 3rem;">
+            <!-- Animated Processing Icon -->
+            <div style="position: relative; margin-bottom: 2rem;">
+                <i class="fas fa-file-alt" style="font-size: 4rem; color: #3498db; opacity: 0.3;"></i>
+                <i class="fas fa-search" id="scanning-icon" style="font-size: 2rem; color: #27ae60; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); animation: pulse 1.5s infinite;"></i>
+            </div>
+            
+            <!-- Progress Bar -->
+            <div style="background: #ecf0f1; border-radius: 25px; height: 8px; margin-bottom: 1rem; overflow: hidden;">
+                <div id="progress-bar" style="background: linear-gradient(45deg, #3498db, #27ae60); height: 100%; width: 0%; border-radius: 25px; transition: width 0.3s ease;"></div>
+            </div>
+            
+            <!-- Progress Text -->
+            <h3 id="progress-title">Processing your document...</h3>
+            <p id="progress-description">Please wait while we analyze your policy document</p>
+            
+            <!-- Progress Steps -->
+            <div id="progress-steps" style="margin-top: 2rem; text-align: left; max-width: 400px; margin-left: auto; margin-right: auto;">
+                <div class="progress-step" data-step="1">
+                    <i class="fas fa-upload" style="color: #27ae60; margin-right: 0.5rem;"></i>
+                    <span>Document uploaded successfully</span>
+                </div>
+                <div class="progress-step" data-step="2">
+                    <i class="fas fa-eye" style="color: #95a5a6; margin-right: 0.5rem;"></i>
+                    <span>Reading document content...</span>
+                </div>
+                <div class="progress-step" data-step="3">
+                    <i class="fas fa-search" style="color: #95a5a6; margin-right: 0.5rem;"></i>
+                    <span>Extracting policy information...</span>
+                </div>
+                <div class="progress-step" data-step="4">
+                    <i class="fas fa-calculator" style="color: #95a5a6; margin-right: 0.5rem;"></i>
+                    <span>Calculating your quote...</span>
+                </div>
+            </div>
+            
+            <!-- Dynamic Tips -->
+            <div id="processing-tip" style="margin-top: 2rem; padding: 1rem; background: rgba(52, 152, 219, 0.1); border-radius: 10px; border-left: 4px solid #3498db;">
+                <p style="margin: 0; font-style: italic;">💡 Loading helpful tips...</p>
+            </div>
+            
+            <!-- Cancel Button -->
+            <button class="btn btn-secondary" onclick="cancelProcessing()" style="margin-top: 2rem;">
+                <i class="fas fa-times"></i> Cancel Processing
+            </button>
+        </div>
+    </div>
+
+    <!-- Instructions -->
+    <div class="card" style="background: rgba(39, 174, 96, 0.1); border-left: 4px solid #27ae60;">
+        <h3><i class="fas fa-clipboard-list"></i> What We Extract From Your Documents:</h3>
+        <div class="grid grid-2">
+            <ul style="list-style: none; padding-left: 0;">
+                <li><i class="fas fa-check text-success"></i> Current premium and coverage details</li>
+                <li><i class="fas fa-check text-success"></i> Vehicle information (make, model, year)</li>
+                <li><i class="fas fa-check text-success"></i> Driver information and experience</li>
+            </ul>
+            <ul style="list-style: none; padding-left: 0;">
+                <li><i class="fas fa-check text-success"></i> Deductible amounts</li>
+                <li><i class="fas fa-check text-success"></i> Policy effective dates</li>
+                <li><i class="fas fa-check text-success"></i> Policy numbers and identifiers</li>
+            </ul>
+        </div>
+        <div class="alert alert-info mt-1">
+            <i class="fas fa-magic"></i> <strong>OCR Powered:</strong> We can read both digital PDFs and photos of your policy documents!
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="card">
+        <h3><i class="fas fa-bolt"></i> Quick Actions</h3>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; margin-top: 1rem;">
+            <a href="/fnol-accurate" class="btn btn-large" style="background: linear-gradient(45deg, #e74c3c, #c0392b); text-decoration: none; display: block; text-align: center; padding: 1.5rem;">
+                <i class="fas fa-exclamation-triangle" style="font-size: 2rem; display: block; margin-bottom: 0.5rem;"></i>
+                <strong>Report a Claim</strong><br>
+                <small>Ultra-Accurate AI Assistant</small>
+            </a>
+            
+            <a href="/tips" class="btn btn-large" style="background: linear-gradient(45deg, #f39c12, #e67e22); text-decoration: none; display: block; text-align: center; padding: 1.5rem;">
+                <i class="fas fa-lightbulb" style="font-size: 2rem; display: block; margin-bottom: 0.5rem;"></i>
+                <strong>Savings Tips</strong><br>
+                <small>Optimize your coverage</small>
+            </a>
+        </div>
+    </div>
+
+    <!-- Camera Modal -->
+    <div id="camera-modal" class="camera-modal">
+        <div class="camera-content">
+            <h3 style="margin-bottom: 1rem;">Take a Photo of Your Policy</h3>
+            <video id="camera-video" autoplay style="width: 100%; max-width: 500px; border-radius: 10px;"></video>
+            <canvas id="camera-canvas" style="display: none;"></canvas>
+            <div style="margin-top: 1rem;">
+                <button class="btn btn-large" onclick="capturePhoto()">
+                    <i class="fas fa-camera"></i> Capture
+                </button>
+                <button class="btn btn-secondary" onclick="closeCamera()" style="margin-left: 1rem;">
+                    <i class="fas fa-times"></i> Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const uploadArea = document.getElementById('upload-area');
+    const fileInput = document.getElementById('file-input');
+    const loadingDiv = document.querySelector('.loading');
+    
+    let selectedFile = null;
+    let processingCancelled = false;
+    let isProcessing = false; // Prevent double uploads
+
+    // Remove click handler from upload area to prevent conflicts
+    // Only handle drag and drop on the main area
+    uploadArea.addEventListener('dragover', function(e) {
+        e.preventDefault();
+        if (isProcessing) return;
+        uploadArea.style.borderColor = '#3498db';
+        uploadArea.style.backgroundColor = 'rgba(52, 152, 219, 0.1)';
+    });
+
+    uploadArea.addEventListener('dragleave', function(e) {
+        e.preventDefault();
+        uploadArea.style.borderColor = '#bdc3c7';
+        uploadArea.style.backgroundColor = 'rgba(255, 255, 255, 0.95)';
+    });
+
+    uploadArea.addEventListener('drop', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        if (isProcessing) return;
+        
+        uploadArea.style.borderColor = '#bdc3c7';
+        uploadArea.style.backgroundColor = 'rgba(255, 255, 255, 0.95)';
+        
+        const files = e.dataTransfer.files;
+        if (files.length > 0) {
+            console.log('File dropped:', files[0].name);
+            handleFileSelection(files[0]);
+        }
+    });
+
+    // Separate function for file selection - no conflicts
+    window.selectFile = function() {
+        console.log('Select file clicked');
+        if (isProcessing) {
+            console.log('Already processing, ignoring click');
+            return;
+        }
+        fileInput.click();
+    };
+
+    fileInput.addEventListener('change', function(e) {
+        console.log('File input changed, files:', e.target.files.length);
+        
+        if (e.target.files.length > 0) {
+            const file = e.target.files[0];
+            console.log('File selected from input:', {
+                name: file.name,
+                type: file.type,
+                size: file.size
+            });
+            handleFileSelection(file);
+        }
+        
+        // Clear the input to allow selecting the same file again if needed
+        e.target.value = '';
+    });
+
+    function handleFileSelection(file) {
+        if (isProcessing) {
+            console.log('Already processing a file, ignoring new selection');
+            showAlert('Please wait for current processing to complete', 'info');
+            return;
+        }
+        
+        console.log('handleFileSelection called with:', file.name, file.type, file.size);
+        
+        const isPDF = file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf');
+        const isImage = file.type.startsWith('image/') || /\.(jpg|jpeg|png|bmp|tiff|heic|webp)$/i.test(file.name);
+        
+        console.log('File type check:', { isPDF, isImage, fileType: file.type });
+        
+        if (!isPDF && !isImage) {
+            showAlert('Please select a PDF file or image (JPG, PNG, etc.).', 'error');
+            console.log('File type rejected:', file.type);
+            return;
+        }
+
+        if (file.size > 16 * 1024 * 1024) { // 16MB limit
+            showAlert('File size must be less than 16MB.', 'error');
+            console.log('File size rejected:', file.size);
+            return;
+        }
+
+        console.log('File accepted, starting processing...');
+        
+        // Set processing flag
+        isProcessing = true;
+        
+        // Process immediately
+        const fileType = isPDF ? 'PDF' : 'Image';
+        showAlert(`${fileType} selected: ${file.name} - Processing...`, 'success');
+        
+        selectedFile = file;
+        processingCancelled = false;
+        showEnhancedLoading();
+        uploadFile(file);
+    }
+
+    function showFilePreview(file) {
+        const fileType = file.type.startsWith('image/') ? 'image' : 'PDF';
+        const fileSize = (file.size / 1024 / 1024).toFixed(2);
+        
+        const previewContent = document.getElementById('preview-content');
+        
+        if (file.type.startsWith('image/')) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                previewContent.innerHTML = `
+                    <img src="${e.target.result}" alt="Preview" style="max-width: 150px; max-height: 150px; border-radius: 10px; margin-right: 1rem;">
+                    <div>
+                        <h4><i class="fas fa-image"></i> ${file.name}</h4>
+                        <p>Type: ${fileType} | Size: ${fileSize} MB</p>
+                        <p style="color: #27ae60;"><i class="fas fa-check-circle"></i> Ready for OCR processing</p>
+                    </div>
+                `;
+            };
+            reader.readAsDataURL(file);
+        } else {
+            previewContent.innerHTML = `
+                <div style="display: flex; align-items: center; justify-content: center; width: 150px; height: 150px; background: rgba(52, 152, 219, 0.1); border-radius: 10px; margin-right: 1rem;">
+                    <i class="fas fa-file-pdf" style="font-size: 4rem; color: #e74c3c;"></i>
+                </div>
+                <div>
+                    <h4><i class="fas fa-file-pdf"></i> ${file.name}</h4>
+                    <p>Type: ${fileType} | Size: ${fileSize} MB</p>
+                    <p style="color: #27ae60;"><i class="fas fa-check-circle"></i> Ready for processing</p>
+                </div>
+            `;
+        }
+        
+        uploadArea.style.display = 'none';
+        filePreview.style.display = 'block';
+    }
+
+    window.processDocument = function() {
+        if (!selectedFile) {
+            showAlert('No file selected', 'error');
+            return;
+        }
+        
+        console.log('Starting to process document:', selectedFile.name);
+        processingCancelled = false;
+        showEnhancedLoading();
+        
+        // Start upload immediately
+        uploadFile(selectedFile);
+    };
+
+    window.clearPreview = function() {
+        selectedFile = null;
+        filePreview.style.display = 'none';
+        uploadArea.style.display = 'block';
+        fileInput.value = '';
+    };
+
+    function showEnhancedLoading() {
+        console.log('Showing enhanced loading...');
+        uploadArea.style.display = 'none';
+        loadingDiv.style.display = 'block';
+        document.body.classList.add('processing-disabled');
+        
+        // Reset progress
+        updateProgress(0, 'Initializing...', 'Preparing to process your document');
+        updateProgressStep(1);
+        
+        // Load and rotate tips
+        loadProcessingTips();
+        
+        // Simulate progress updates - more realistic timing
+        let progress = 0;
+        const progressInterval = setInterval(() => {
+            if (processingCancelled) {
+                console.log('Progress cancelled');
+                clearInterval(progressInterval);
+                return;
+            }
+            
+            progress += Math.random() * 8 + 2; // Slower, more realistic progress
+            if (progress > 95) progress = 95;
+            
+            if (progress < 20) {
+                updateProgress(progress, 'Reading document...', 'Analyzing document structure and content');
+                updateProgressStep(2);
+            } else if (progress < 50) {
+                updateProgress(progress, 'Extracting information...', 'Using OCR to identify policy details');
+                updateProgressStep(3);
+            } else if (progress < 85) {
+                updateProgress(progress, 'Calculating quote...', 'Processing rates and discounts');
+                updateProgressStep(4);
+            } else {
+                updateProgress(progress, 'Almost done...', 'Finalizing your personalized quote');
+            }
+        }, 1200); // Slower updates for better UX
+        
+        // Store interval for cleanup
+        window.currentProgressInterval = progressInterval;
+        console.log('Progress interval started');
+    }
+
+    function loadProcessingTips() {
+        // Load initial tip
+        fetch('/api/processing-tips')
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('processing-tip').innerHTML = `<p style="margin: 0; font-style: italic;">${data.tip}</p>`;
+            })
+            .catch(() => {
+                document.getElementById('processing-tip').innerHTML = '<p style="margin: 0; font-style: italic;">💡 Processing your document with advanced OCR technology...</p>';
+            });
+        
+        // Rotate tips every 4 seconds
+        const tipInterval = setInterval(() => {
+            if (processingCancelled) {
+                clearInterval(tipInterval);
+                return;
+            }
+            
+            fetch('/api/processing-tips')
+                .then(response => response.json())
+                .then(data => {
+                    const tipElement = document.getElementById('processing-tip');
+                    tipElement.style.opacity = '0.5';
+                    setTimeout(() => {
+                        tipElement.innerHTML = `<p style="margin: 0; font-style: italic;">${data.tip}</p>`;
+                        tipElement.style.opacity = '1';
+                    }, 300);
+                })
+                .catch(() => {
+                    // Fallback tips if API fails
+                    const fallbackTips = [
+                        "💡 OCR technology can read both digital and scanned documents!",
+                        "🚀 Your quote will include personalized discount recommendations.",
+                        "📊 We analyze multiple factors to get you the best rates.",
+                        "🔒 All processing happens securely on our servers."
+                    ];
+                    const randomTip = fallbackTips[Math.floor(Math.random() * fallbackTips.length)];
+                    const tipElement = document.getElementById('processing-tip');
+                    tipElement.style.opacity = '0.5';
+                    setTimeout(() => {
+                        tipElement.innerHTML = `<p style="margin: 0; font-style: italic;">${randomTip}</p>`;
+                        tipElement.style.opacity = '1';
+                    }, 300);
+                });
+        }, 4000);
+        
+        window.currentTipInterval = tipInterval;
+    }
+
+    function updateProgress(percentage, title, description) {
+        document.getElementById('progress-bar').style.width = percentage + '%';
+        document.getElementById('progress-title').textContent = title;
+        document.getElementById('progress-description').textContent = description;
+    }
+
+    function updateProgressStep(step) {
+        document.querySelectorAll('.progress-step').forEach((el, index) => {
+            el.classList.remove('active', 'completed');
+            if (index + 1 < step) {
+                el.classList.add('completed');
+                el.querySelector('i').style.color = '#27ae60';
+            } else if (index + 1 === step) {
+                el.classList.add('active');
+                el.querySelector('i').style.color = '#3498db';
+            } else {
+                el.querySelector('i').style.color = '#95a5a6';
+            }
+        });
+    }
+
+    window.cancelProcessing = function() {
+        console.log('Cancel processing clicked');
+        processingCancelled = true;
+        
+        // Clear all intervals
+        if (window.currentProgressInterval) {
+            clearInterval(window.currentProgressInterval);
+            console.log('Progress interval cleared');
+        }
+        if (window.currentTipInterval) {
+            clearInterval(window.currentTipInterval);
+            console.log('Tip interval cleared');
+        }
+        
+        // Abort any ongoing fetch request
+        if (window.currentUploadController) {
+            window.currentUploadController.abort();
+            console.log('Upload request aborted');
+        }
+        
+        hideLoading();
+        showAlert('Processing cancelled by user', 'info');
+        resetUploadArea();
+    };
+
+    function hideLoading() {
+        loadingDiv.style.display = 'none';
+        document.body.classList.remove('processing-disabled');
+        isProcessing = false; // Reset processing flag
+        
+        // Clean up intervals
+        if (window.currentProgressInterval) {
+            clearInterval(window.currentProgressInterval);
+        }
+        if (window.currentTipInterval) {
+            clearInterval(window.currentTipInterval);
+        }
+    }
+
+    function uploadFile(file) {
+        console.log('Starting file upload:', {
+            name: file.name,
+            type: file.type,
+            size: file.size
+        });
+        
+        const formData = new FormData();
+        formData.append('policy_document', file);
+
+        // Create AbortController for cancellation
+        window.currentUploadController = new AbortController();
+
+        console.log('Sending POST request to /upload...');
+
+        fetch('/upload', {
+            method: 'POST',
+            body: formData,
+            signal: window.currentUploadController.signal
+        })
+        .then(response => {
+            console.log('Upload response received:', {
+                status: response.status,
+                statusText: response.statusText,
+                ok: response.ok
+            });
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status} - ${response.statusText}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Upload successful, response data:', data);
+            
+            // Clear intervals
+            if (window.currentProgressInterval) {
+                clearInterval(window.currentProgressInterval);
+            }
+            if (window.currentTipInterval) {
+                clearInterval(window.currentTipInterval);
+            }
+            
+            if (processingCancelled) {
+                console.log('Processing was cancelled, ignoring response');
+                return;
+            }
+            
+            if (data.error) {
+                console.error('Server returned error:', data.error);
+                hideLoading();
+                showAlert(data.error, 'error');
+                resetUploadArea();
+            } else {
+                console.log('Processing successful, showing completion...');
+                // Complete progress
+                updateProgress(100, 'Complete!', 'Your quote is ready');
+                updateProgressStep(5);
+                
+                // Show success tip
+                document.getElementById('processing-tip').innerHTML = '<p style="margin: 0; font-style: italic;">🎉 Success! Your personalized quote has been generated.</p>';
+                
+                setTimeout(() => {
+                    hideLoading();
+                    showAlert('Document processed successfully! Redirecting to quote...', 'success');
+                    storeQuoteData(data);
+                    setTimeout(() => {
+                        window.location.href = '/quote';
+                    }, 1500);
+                }, 1500);
+            }
+        })
+        .catch(error => {
+            console.error('Upload error:', error);
+            
+            // Clear intervals
+            if (window.currentProgressInterval) {
+                clearInterval(window.currentProgressInterval);
+            }
+            if (window.currentTipInterval) {
+                clearInterval(window.currentTipInterval);
+            }
+            
+            if (processingCancelled || error.name === 'AbortError') {
+                console.log('Upload was cancelled');
+                return;
+            }
+            
+            hideLoading();
+            showAlert('Error processing file: ' + error.message, 'error');
+            resetUploadArea();
+        });
+    }
+    
+    function resetUploadArea() {
+        uploadArea.style.display = 'block';
+        fileInput.value = '';
+        selectedFile = null;
+        isProcessing = false; // Reset processing flag
+    }
+
+    // Camera functionality - completely separate from file upload
+    let cameraStream = null;
+
+    window.openCamera = function() {
+        console.log('Camera button explicitly clicked');
+        
+        // Prevent opening if already processing
+        if (isProcessing) {
+            console.log('Camera blocked - processing in progress');
+            showAlert('Please wait for current processing to complete', 'info');
+            return;
+        }
+        
+        const modal = document.getElementById('camera-modal');
+        const video = document.getElementById('camera-video');
+        
+        console.log('Requesting camera access for photo capture...');
+        
+        navigator.mediaDevices.getUserMedia({ 
+            video: { 
+                facingMode: 'environment', // Back camera preferred
+                width: { ideal: 1280 },
+                height: { ideal: 720 }
+            } 
+        })
+        .then(stream => {
+            console.log('Camera access granted');
+            cameraStream = stream;
+            video.srcObject = stream;
+            modal.classList.add('show');
+        })
+        .catch(err => {
+            console.error('Camera error:', err);
+            showAlert('Camera access denied or not available. Please use file upload instead.', 'error');
+        });
+    };
+
+    window.closeCamera = function() {
+        console.log('Closing camera');
+        const modal = document.getElementById('camera-modal');
+        const video = document.getElementById('camera-video');
+        
+        if (cameraStream) {
+            cameraStream.getTracks().forEach(track => {
+                track.stop();
+                console.log('Camera track stopped');
+            });
+            cameraStream = null;
+        }
+        
+        video.srcObject = null;
+        modal.classList.remove('show');
+    };
+
+    window.capturePhoto = function() {
+        console.log('Capturing photo from camera');
+        const video = document.getElementById('camera-video');
+        const canvas = document.getElementById('camera-canvas');
+        const context = canvas.getContext('2d');
+        
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        context.drawImage(video, 0, 0);
+        
+        canvas.toBlob(blob => {
+            const file = new File([blob], 'camera-capture.jpg', { type: 'image/jpeg' });
+            console.log('Photo captured from camera, processing...');
+            closeCamera();
+            handleFileSelection(file);
+        }, 'image/jpeg', 0.8);
+    };
+});
+</script>
+{% endblock %}

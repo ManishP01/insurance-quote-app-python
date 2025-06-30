@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+
+{% block title %}Claim Submitted Successfully{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="hero-section" style="text-align: center; padding: 3rem 0;">
+        <div style="font-size: 4rem; color: #27ae60; margin-bottom: 1rem;">
+            <i class="fas fa-check-circle"></i>
+        </div>
+        <h1 style="color: #27ae60;">Claim Successfully Submitted</h1>
+        <p class="hero-subtitle">Your First Notice of Loss has been received and is being processed</p>
+    </div>
+
+    <div class="card">
+        <h2><i class="fas fa-clipboard-check"></i> What Happens Next</h2>
+        
+        <div class="timeline" style="margin: 2rem 0;">
+            <div class="timeline-item" style="display: flex; align-items: center; margin-bottom: 2rem; padding: 1rem; background: rgba(39, 174, 96, 0.1); border-radius: 10px; border-left: 4px solid #27ae60;">
+                <div style="font-size: 2rem; color: #27ae60; margin-right: 1rem;">
+                    <i class="fas fa-phone"></i>
+                </div>
+                <div>
+                    <h3 style="margin: 0; color: #27ae60;">Within 24 Hours</h3>
+                    <p style="margin: 0.5rem 0 0;">A claims adjuster will contact you to discuss your claim and next steps</p>
+                </div>
+            </div>
+            
+            <div class="timeline-item" style="display: flex; align-items: center; margin-bottom: 2rem; padding: 1rem; background: rgba(52, 152, 219, 0.1); border-radius: 10px; border-left: 4px solid #3498db;">
+                <div style="font-size: 2rem; color: #3498db; margin-right: 1rem;">
+                    <i class="fas fa-envelope"></i>
+                </div>
+                <div>
+                    <h3 style="margin: 0; color: #3498db;">Email Confirmation</h3>
+                    <p style="margin: 0.5rem 0 0;">You'll receive a detailed confirmation email with your claim number and reference information</p>
+                </div>
+            </div>
+            
+            <div class="timeline-item" style="display: flex; align-items: center; margin-bottom: 2rem; padding: 1rem; background: rgba(155, 89, 182, 0.1); border-radius: 10px; border-left: 4px solid #9b59b6;">
+                <div style="font-size: 2rem; color: #9b59b6; margin-right: 1rem;">
+                    <i class="fas fa-search"></i>
+                </div>
+                <div>
+                    <h3 style="margin: 0; color: #9b59b6;">Investigation Begins</h3>
+                    <p style="margin: 0.5rem 0 0;">Our team will begin investigating your claim and may request additional documentation</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2><i class="fas fa-info-circle"></i> Important Information</h2>
+        
+        <div class="info-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; margin-top: 1rem;">
+            <div class="info-card" style="padding: 1.5rem; background: rgba(241, 196, 15, 0.1); border-radius: 10px; border-left: 4px solid #f1c40f;">
+                <h3><i class="fas fa-id-card"></i> Keep Your Claim Number</h3>
+                <p>Reference this number in all communications about your claim. You'll receive it in your confirmation email.</p>
+            </div>
+            
+            <div class="info-card" style="padding: 1.5rem; background: rgba(230, 126, 34, 0.1); border-radius: 10px; border-left: 4px solid #e67e22;">
+                <h3><i class="fas fa-camera"></i> Document Everything</h3>
+                <p>Take photos of any damage, keep receipts for expenses, and maintain records of all related communications.</p>
+            </div>
+            
+            <div class="info-card" style="padding: 1.5rem; background: rgba(231, 76, 60, 0.1); border-radius: 10px; border-left: 4px solid #e74c3c;">
+                <h3><i class="fas fa-shield-alt"></i> Prevent Further Damage</h3>
+                <p>Take reasonable steps to prevent additional damage to your property while waiting for the adjuster.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2><i class="fas fa-question-circle"></i> Need Help?</h2>
+        
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; margin-top: 1rem;">
+            <a href="/fnol" class="btn btn-large" style="text-decoration: none; display: block; text-align: center;">
+                <i class="fas fa-plus"></i> Report Another Claim
+            </a>
+            
+            <a href="tel:1-800-CLAIMS" class="btn btn-large" style="background: linear-gradient(45deg, #e74c3c, #c0392b); text-decoration: none; display: block; text-align: center;">
+                <i class="fas fa-phone"></i> Call Claims Hotline
+            </a>
+            
+            <a href="/" class="btn btn-secondary" style="text-decoration: none; display: block; text-align: center;">
+                <i class="fas fa-home"></i> Back to Home
+            </a>
+        </div>
+    </div>
+
+    <div class="card" style="background: rgba(39, 174, 96, 0.1); border-left: 4px solid #27ae60;">
+        <h3><i class="fas fa-heart"></i> We're Here for You</h3>
+        <p>We understand that filing a claim can be stressful. Our team is committed to making this process as smooth as possible and getting you back to normal as quickly as we can. If you have any questions or concerns, please don't hesitate to reach out.</p>
+        
+        <div style="margin-top: 1rem; font-style: italic; color: #27ae60;">
+            <strong>Remember:</strong> You did the right thing by reporting this promptly. We're here to help you through every step of the process.
+        </div>
+    </div>
+</div>
+{% endblock %}

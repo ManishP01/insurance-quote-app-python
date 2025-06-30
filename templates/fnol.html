@@ -1,0 +1,886 @@
+{% extends "base.html" %}
+
+{% block title %}Report a Claim - FNOL{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="hero-section">
+        <h1><i class="fas fa-headset"></i> Report Your Claim</h1>
+        <p class="hero-subtitle">Speak with our AI Claims Assistant - Available 24/7</p>
+    </div>
+
+    <!-- FNOL Agent Interface -->
+    <div id="fnol-interface" class="card">
+        <div class="agent-header" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 2rem; border-radius: 15px 15px 0 0; text-align: center;">
+            <div class="agent-avatar" style="width: 80px; height: 80px; border-radius: 50%; background: rgba(255,255,255,0.2); margin: 0 auto 1rem; display: flex; align-items: center; justify-content: center;">
+                <i class="fas fa-user-tie" style="font-size: 2rem;"></i>
+            </div>
+            <h2 style="margin: 0;">Claims Assistant Sarah</h2>
+            <p style="margin: 0.5rem 0 0; opacity: 0.9;">I'm here to help you through this difficult time</p>
+        </div>
+
+        <!-- Conversation Area -->
+        <div id="conversation-area" style="padding: 2rem; max-height: 400px; overflow-y: auto; background: #f8f9fa;">
+            <div class="message agent-message">
+                <div class="message-content">
+                    <strong>Sarah:</strong> Hello, I'm Sarah, your AI Claims Assistant. I'm here to help you report your claim and guide you through this process. I understand this might be a stressful time, and I'm here to make this as easy as possible for you.
+                    <br><br>
+                    To get started, could you please tell me what happened? Take your time, and speak naturally - I'll listen carefully.
+                </div>
+                <div class="message-time">Just now</div>
+            </div>
+        </div>
+
+        <!-- Voice Controls -->
+        <div class="voice-controls" style="padding: 2rem; border-top: 1px solid #e9ecef;">
+            <div class="recording-status" id="recording-status" style="text-align: center; margin-bottom: 1rem;">
+                <div id="status-indicator" class="status-ready">
+                    <i class="fas fa-microphone"></i>
+                    <span>Ready to listen</span>
+                </div>
+            </div>
+
+            <div class="control-buttons" style="display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap;">
+                <button id="test-button" class="btn btn-secondary" onclick="testFunction()">
+                    <i class="fas fa-bug"></i> Test
+                </button>
+                <button id="start-recording" class="btn btn-large" style="background: linear-gradient(45deg, #e74c3c, #c0392b);">
+                    <i class="fas fa-microphone"></i> Start Speaking
+                </button>
+                <button id="stop-recording" class="btn btn-large" style="background: linear-gradient(45deg, #95a5a6, #7f8c8d); display: none;">
+                    <i class="fas fa-stop"></i> Stop Recording
+                </button>
+                <button id="mute-sarah" class="btn btn-secondary">
+                    <i class="fas fa-volume-up"></i> Mute Sarah
+                </button>
+            </div>
+
+            <!-- Audio Visualization -->
+            <div id="audio-visualizer" style="display: none; margin-top: 1rem; text-align: center;">
+                <canvas id="visualizer-canvas" width="300" height="60" style="border-radius: 30px; background: #2c3e50;"></canvas>
+            </div>
+            
+            <!-- Sarah Speaking Indicator -->
+            <div id="sarah-speaking" style="display: none; text-align: center; margin-top: 1rem; padding: 1rem; background: rgba(102, 126, 234, 0.1); border-radius: 10px;">
+                <div style="display: flex; align-items: center; justify-content: center; gap: 1rem;">
+                    <div class="speaking-animation" style="width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center; animation: pulse 1.5s infinite;">
+                        <i class="fas fa-volume-up" style="color: white;"></i>
+                    </div>
+                    <span style="font-weight: bold; color: #667eea;">Sarah is speaking...</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Live Transcript -->
+        <div id="live-transcript" style="display: none; padding: 1rem; background: rgba(52, 152, 219, 0.1); border-radius: 10px; margin: 1rem 2rem;">
+            <h4><i class="fas fa-closed-captioning"></i> Live Transcript:</h4>
+            <div id="transcript-text" style="font-style: italic; color: #2c3e50; min-height: 50px; padding: 1rem; background: white; border-radius: 5px; border-left: 4px solid #3498db;">
+                Listening...
+            </div>
+        </div>
+    </div>
+
+    <!-- Claim Summary -->
+    <div id="claim-summary" class="card" style="display: none;">
+        <h3><i class="fas fa-clipboard-list"></i> Claim Summary</h3>
+        <div id="extracted-info">
+            <!-- Dynamically populated claim information -->
+        </div>
+        
+        <div class="summary-actions" style="margin-top: 2rem; text-align: center;">
+            <button id="review-transcript" class="btn btn-large">
+                <i class="fas fa-file-alt"></i> Review Full Transcript
+            </button>
+            <button id="submit-claim" class="btn btn-large" style="background: linear-gradient(45deg, #27ae60, #229954);">
+                <i class="fas fa-paper-plane"></i> Submit Claim
+            </button>
+        </div>
+    </div>
+
+    <!-- Transcript Review Modal -->
+    <div id="transcript-modal" class="modal" style="display: none;">
+        <div class="modal-content" style="max-width: 800px;">
+            <div class="modal-header">
+                <h3><i class="fas fa-file-alt"></i> Review Your Transcript</h3>
+                <button class="modal-close" onclick="closeTranscriptModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="full-transcript" style="max-height: 400px; overflow-y: auto; padding: 1rem; background: #f8f9fa; border-radius: 5px; font-family: monospace; line-height: 1.6;">
+                    <!-- Full conversation transcript -->
+                </div>
+                <div style="margin-top: 1rem;">
+                    <label>
+                        <input type="checkbox" id="transcript-confirmed"> 
+                        I confirm this transcript accurately represents our conversation
+                    </label>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeTranscriptModal()">Edit More</button>
+                <button id="final-submit" class="btn btn-large" style="background: linear-gradient(45deg, #27ae60, #229954);">
+                    <i class="fas fa-check"></i> Confirm & Submit
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.message {
+    margin-bottom: 1rem;
+    padding: 1rem;
+    border-radius: 10px;
+    position: relative;
+}
+
+.agent-message {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    margin-right: 20%;
+}
+
+.user-message {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    color: white;
+    margin-left: 20%;
+}
+
+.message-time {
+    font-size: 0.8rem;
+    opacity: 0.7;
+    margin-top: 0.5rem;
+}
+
+.status-ready {
+    color: #27ae60;
+    font-size: 1.2rem;
+}
+
+.status-listening {
+    color: #e74c3c;
+    font-size: 1.2rem;
+    animation: pulse 1.5s infinite;
+}
+
+.status-processing {
+    color: #f39c12;
+    font-size: 1.2rem;
+}
+
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.5; }
+    100% { opacity: 1; }
+}
+
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background: white;
+    border-radius: 15px;
+    width: 90%;
+    max-height: 90%;
+    overflow: hidden;
+}
+
+.modal-header {
+    padding: 1.5rem;
+    border-bottom: 1px solid #e9ecef;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    font-size: 2rem;
+    cursor: pointer;
+    color: #95a5a6;
+}
+
+.modal-body {
+    padding: 1.5rem;
+}
+
+.modal-footer {
+    padding: 1.5rem;
+    border-top: 1px solid #e9ecef;
+    text-align: right;
+}
+</style>
+
+<script>
+// Global test function
+function testFunction() {
+    console.log('Test button clicked - JavaScript is working!');
+    alert('JavaScript is working! FNOL Agent should be functional.');
+    
+    // Test speech synthesis
+    if ('speechSynthesis' in window) {
+        const utterance = new SpeechSynthesisUtterance('Hello, this is a test of text to speech.');
+        speechSynthesis.speak(utterance);
+        console.log('Text-to-speech test initiated');
+    } else {
+        console.log('Speech synthesis not supported');
+    }
+}
+
+// Enhanced FNOL AI Agent with Text-to-Speech and Intelligent Questioning
+class FNOLAgent {
+    constructor() {
+        this.isRecording = false;
+        this.mediaRecorder = null;
+        this.audioChunks = [];
+        this.conversation = [];
+        this.claimData = {};
+        this.recognition = null;
+        this.currentTranscript = '';
+        this.speechSynthesis = window.speechSynthesis;
+        this.sarahVoice = null;
+        this.isMuted = false;
+        this.conversationStage = 'initial';
+        this.claimType = null;
+        this.requiredInfo = {};
+        
+        this.initializeSpeechRecognition();
+        this.initializeTextToSpeech();
+        this.initializeEventListeners();
+        this.startConversation();
+    }
+    
+    initializeTextToSpeech() {
+        // Wait for voices to load
+        if (this.speechSynthesis.getVoices().length === 0) {
+            this.speechSynthesis.addEventListener('voiceschanged', () => {
+                this.selectSarahVoice();
+            });
+        } else {
+            this.selectSarahVoice();
+        }
+    }
+    
+    selectSarahVoice() {
+        const voices = this.speechSynthesis.getVoices();
+        
+        // Prefer female voices that sound natural
+        const preferredVoices = [
+            'Samantha', 'Karen', 'Victoria', 'Susan', 'Allison', // macOS
+            'Microsoft Zira', 'Microsoft Hazel', // Windows
+            'Google UK English Female', 'Google US English Female' // Chrome
+        ];
+        
+        for (const voiceName of preferredVoices) {
+            const voice = voices.find(v => v.name.includes(voiceName));
+            if (voice) {
+                this.sarahVoice = voice;
+                console.log('Selected voice for Sarah:', voice.name);
+                return;
+            }
+        }
+        
+        // Fallback to any female voice
+        const femaleVoice = voices.find(v => 
+            v.name.toLowerCase().includes('female') || 
+            v.name.toLowerCase().includes('woman') ||
+            ['Samantha', 'Karen', 'Victoria', 'Susan', 'Allison', 'Zira', 'Hazel'].some(name => 
+                v.name.includes(name)
+            )
+        );
+        
+        this.sarahVoice = femaleVoice || voices[0];
+        console.log('Selected voice for Sarah:', this.sarahVoice?.name || 'Default');
+    }
+    
+    initializeSpeechRecognition() {
+        console.log('Initializing speech recognition...');
+        
+        if ('webkitSpeechRecognition' in window) {
+            this.recognition = new webkitSpeechRecognition();
+            console.log('Using webkitSpeechRecognition');
+        } else if ('SpeechRecognition' in window) {
+            this.recognition = new SpeechRecognition();
+            console.log('Using SpeechRecognition');
+        } else {
+            console.warn('Speech recognition not supported in this browser');
+            return;
+        }
+        
+        this.recognition.continuous = true;
+        this.recognition.interimResults = true;
+        this.recognition.lang = 'en-US';
+        
+        console.log('Speech recognition configured');
+        
+        this.recognition.onstart = () => {
+            console.log('Speech recognition started');
+            this.updateStatus('listening', 'Listening... speak naturally');
+            document.getElementById('live-transcript').style.display = 'block';
+        };
+        
+        this.recognition.onresult = (event) => {
+            console.log('Speech recognition result received');
+            let interimTranscript = '';
+            let finalTranscript = '';
+            
+            for (let i = event.resultIndex; i < event.results.length; i++) {
+                const transcript = event.results[i][0].transcript;
+                if (event.results[i].isFinal) {
+                    finalTranscript += transcript;
+                } else {
+                    interimTranscript += transcript;
+                }
+            }
+            
+            const transcriptElement = document.getElementById('transcript-text');
+            if (transcriptElement) {
+                transcriptElement.innerHTML = 
+                    finalTranscript + '<span style="opacity: 0.5;">' + interimTranscript + '</span>';
+            }
+            
+            if (finalTranscript) {
+                this.currentTranscript += finalTranscript;
+                console.log('Final transcript:', finalTranscript);
+            }
+        };
+        
+        this.recognition.onerror = (event) => {
+            console.error('Speech recognition error:', event.error);
+            this.updateStatus('ready', 'Error: ' + event.error + '. Ready to try again.');
+            alert('Speech recognition error: ' + event.error);
+        };
+        
+        this.recognition.onend = () => {
+            console.log('Speech recognition ended');
+            if (this.currentTranscript.trim()) {
+                console.log('Processing transcript:', this.currentTranscript.trim());
+                this.processUserInput(this.currentTranscript.trim());
+                this.currentTranscript = '';
+            }
+            this.updateStatus('processing', 'Processing your response...');
+        };
+        
+        console.log('Speech recognition event handlers set up');
+    }
+    
+    initializeEventListeners() {
+        console.log('Initializing event listeners...');
+        
+        const startButton = document.getElementById('start-recording');
+        const stopButton = document.getElementById('stop-recording');
+        const muteButton = document.getElementById('mute-sarah');
+        
+        if (!startButton) {
+            console.error('Start recording button not found!');
+            return;
+        }
+        
+        console.log('Adding click listener to start button');
+        startButton.addEventListener('click', (e) => {
+            console.log('Start recording button clicked');
+            e.preventDefault();
+            this.startRecording();
+        });
+        
+        if (stopButton) {
+            stopButton.addEventListener('click', (e) => {
+                console.log('Stop recording button clicked');
+                e.preventDefault();
+                this.stopRecording();
+            });
+        }
+        
+        if (muteButton) {
+            muteButton.addEventListener('click', (e) => {
+                console.log('Mute button clicked');
+                e.preventDefault();
+                this.toggleMute();
+            });
+        }
+        
+        // Other event listeners
+        const submitButton = document.getElementById('submit-claim');
+        const finalSubmitButton = document.getElementById('final-submit');
+        
+        if (submitButton) {
+            submitButton.addEventListener('click', () => {
+                this.showTranscriptReview();
+            });
+        }
+        
+        if (finalSubmitButton) {
+            finalSubmitButton.addEventListener('click', () => {
+                this.submitClaim();
+            });
+        }
+        
+        console.log('Event listeners initialized');
+    }
+    
+    startConversation() {
+        const welcomeMessage = "Hello, I'm Sarah, your AI Claims Assistant. I'm here to help you report your claim and guide you through this process. I understand this might be a stressful time, and I'm here to make this as easy as possible for you. To get started, could you please tell me what happened? Take your time, and speak naturally - I'll listen carefully.";
+        
+        // Speak the welcome message
+        this.speakMessage(welcomeMessage);
+    }
+    
+    speakMessage(message, callback = null) {
+        if (this.isMuted) {
+            if (callback) callback();
+            return;
+        }
+        
+        // Stop any current speech
+        this.speechSynthesis.cancel();
+        
+        const utterance = new SpeechSynthesisUtterance(message);
+        
+        if (this.sarahVoice) {
+            utterance.voice = this.sarahVoice;
+        }
+        
+        utterance.rate = 0.9; // Slightly slower for clarity
+        utterance.pitch = 1.0;
+        utterance.volume = 0.8;
+        
+        // Show speaking indicator
+        document.getElementById('sarah-speaking').style.display = 'block';
+        
+        utterance.onstart = () => {
+            console.log('Sarah started speaking');
+        };
+        
+        utterance.onend = () => {
+            console.log('Sarah finished speaking');
+            document.getElementById('sarah-speaking').style.display = 'none';
+            if (callback) callback();
+        };
+        
+        utterance.onerror = (event) => {
+            console.error('Speech synthesis error:', event);
+            document.getElementById('sarah-speaking').style.display = 'none';
+            if (callback) callback();
+        };
+        
+        this.speechSynthesis.speak(utterance);
+    }
+    
+    toggleMute() {
+        this.isMuted = !this.isMuted;
+        const button = document.getElementById('mute-sarah');
+        
+        if (this.isMuted) {
+            button.innerHTML = '<i class="fas fa-volume-mute"></i> Unmute Sarah';
+            this.speechSynthesis.cancel(); // Stop current speech
+        } else {
+            button.innerHTML = '<i class="fas fa-volume-up"></i> Mute Sarah';
+        }
+    }
+    
+    startRecording() {
+        console.log('startRecording called');
+        
+        if (!this.recognition) {
+            console.error('Speech recognition not supported');
+            alert('Speech recognition not supported in this browser. Please use Chrome or Safari.');
+            return;
+        }
+        
+        console.log('Starting speech recognition...');
+        
+        try {
+            this.isRecording = true;
+            document.getElementById('start-recording').style.display = 'none';
+            document.getElementById('stop-recording').style.display = 'inline-block';
+            
+            this.recognition.start();
+            console.log('Speech recognition started successfully');
+        } catch (error) {
+            console.error('Error starting speech recognition:', error);
+            alert('Error starting speech recognition: ' + error.message);
+            this.isRecording = false;
+            document.getElementById('start-recording').style.display = 'inline-block';
+            document.getElementById('stop-recording').style.display = 'none';
+        }
+    }
+    
+    stopRecording() {
+        this.isRecording = false;
+        document.getElementById('start-recording').style.display = 'inline-block';
+        document.getElementById('stop-recording').style.display = 'none';
+        document.getElementById('live-transcript').style.display = 'none';
+        
+        if (this.recognition) {
+            this.recognition.stop();
+        }
+    }
+    
+    updateStatus(status, message) {
+        const indicator = document.getElementById('status-indicator');
+        indicator.className = `status-${status}`;
+        indicator.innerHTML = `<i class="fas fa-microphone"></i> <span>${message}</span>`;
+    }
+    
+    async processUserInput(userInput) {
+        // Add user message to conversation
+        this.addMessage('user', userInput);
+        
+        // Generate AI response
+        const aiResponse = await this.generateAIResponse(userInput);
+        
+        // Add AI response to conversation
+        this.addMessage('agent', aiResponse.message);
+        
+        // Speak the AI response
+        this.speakMessage(aiResponse.message);
+        
+        // Update claim data if new information was extracted
+        if (aiResponse.extractedData) {
+            Object.assign(this.claimData, aiResponse.extractedData);
+            this.updateClaimSummary();
+        }
+        
+        this.updateStatus('ready', 'Ready to listen');
+    }
+    
+    async generateAIResponse(userInput) {
+        // Simulate AI processing delay
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
+        // Determine claim type and conversation stage
+        const response = this.getIntelligentResponse(userInput);
+        
+        return response;
+    }
+    
+    getIntelligentResponse(input) {
+        const lowerInput = input.toLowerCase();
+        
+        // First, determine claim type if not already set
+        if (!this.claimType) {
+            if (lowerInput.includes('accident') || lowerInput.includes('crash') || lowerInput.includes('collision') || lowerInput.includes('hit')) {
+                this.claimType = 'auto_accident';
+                this.conversationStage = 'auto_details';
+                return {
+                    message: "I'm so sorry to hear about your accident. That must have been very frightening, and I'm here to help you through this. Let me gather some important details. First, when did this accident occur? Please tell me the date and approximate time.",
+                    extractedData: { incidentType: 'Vehicle Accident' }
+                };
+            } else if (lowerInput.includes('theft') || lowerInput.includes('stolen') || lowerInput.includes('burglar') || lowerInput.includes('break') || lowerInput.includes('broke in')) {
+                this.claimType = 'theft';
+                this.conversationStage = 'theft_details';
+                return {
+                    message: "I understand how violating it feels to have your property stolen. This is a serious matter and we'll get this reported right away. Let me gather the essential information. When did you first discover the theft? Please give me the date and time if you know it.",
+                    extractedData: { incidentType: 'Theft/Burglary' }
+                };
+            } else if (lowerInput.includes('fire') || lowerInput.includes('smoke') || lowerInput.includes('burn') || lowerInput.includes('flame')) {
+                this.claimType = 'fire';
+                this.conversationStage = 'fire_details';
+                return {
+                    message: "A fire can be absolutely devastating, and I'm so glad you're safe. Let me help you get this claim started immediately. When did the fire occur? Please tell me the date and time, and whether the fire department responded to the scene.",
+                    extractedData: { incidentType: 'Fire Damage' }
+                };
+            } else if (lowerInput.includes('water') || lowerInput.includes('flood') || lowerInput.includes('leak') || lowerInput.includes('pipe') || lowerInput.includes('basement')) {
+                this.claimType = 'water';
+                this.conversationStage = 'water_details';
+                return {
+                    message: "Water damage can be extensive and needs immediate attention. I'm here to help you get this documented properly. When did the water damage occur? Please tell me the date and time, and what caused the water damage - was it a burst pipe, storm, or something else?",
+                    extractedData: { incidentType: 'Water Damage' }
+                };
+            } else {
+                return {
+                    message: "Thank you for starting to tell me what happened. To make sure I can help you properly, could you give me a bit more detail about the type of incident? For example, was this a car accident, theft, fire, water damage, or something else? The more specific you can be, the better I can assist you.",
+                    extractedData: null
+                };
+            }
+        }
+        
+        // Continue with specific questioning based on claim type
+        return this.getStageSpecificQuestions(input);
+    }
+    
+    getStageSpecificQuestions(input) {
+        switch (this.claimType) {
+            case 'auto_accident':
+                return this.getAutoAccidentQuestions(input);
+            case 'theft':
+                return this.getTheftQuestions(input);
+            case 'fire':
+                return this.getFireQuestions(input);
+            case 'water':
+                return this.getWaterDamageQuestions(input);
+            default:
+                return this.getGeneralQuestions(input);
+        }
+    }
+    
+    getAutoAccidentQuestions(input) {
+        const lowerInput = input.toLowerCase();
+        
+        // Check what information we still need
+        if (!this.requiredInfo.dateTime) {
+            // Extract date/time information
+            this.requiredInfo.dateTime = this.extractDateTime(input);
+            return {
+                message: "Thank you for that information. Now, where exactly did this accident happen? Please give me the street address or intersection, city, and state. Also, were there any injuries to you, your passengers, or anyone in the other vehicle?",
+                extractedData: { dateTime: this.requiredInfo.dateTime }
+            };
+        } else if (!this.requiredInfo.location) {
+            this.requiredInfo.location = this.extractLocation(input);
+            return {
+                message: "I've noted the location. Now, can you describe what happened? Who was at fault? Were the police called to the scene? If so, do you have a police report number?",
+                extractedData: { location: this.requiredInfo.location }
+            };
+        } else if (!this.requiredInfo.description) {
+            this.requiredInfo.description = input;
+            return {
+                message: "Thank you for explaining what happened. Now I need some details about the vehicles involved. What is the make, model, and year of your vehicle? And do you have the license plate number of the other vehicle involved?",
+                extractedData: { description: input }
+            };
+        } else if (!this.requiredInfo.vehicleInfo) {
+            this.requiredInfo.vehicleInfo = this.extractVehicleInfo(input);
+            return {
+                message: "Perfect. Last few questions: Do you have the other driver's insurance information? And can you estimate the damage to your vehicle - is it drivable? We'll also need photos when possible.",
+                extractedData: { vehicleInfo: this.requiredInfo.vehicleInfo }
+            };
+        } else {
+            return {
+                message: "Excellent, I believe I have all the essential information for your auto accident claim. Let me summarize what we've covered and then we can submit this to our claims team for immediate processing.",
+                extractedData: { finalInfo: input }
+            };
+        }
+    }
+    
+    getTheftQuestions(input) {
+        if (!this.requiredInfo.dateTime) {
+            this.requiredInfo.dateTime = this.extractDateTime(input);
+            return {
+                message: "Thank you. Where did this theft occur? Please give me the address. Also, have you contacted the police and filed a police report? This is very important for theft claims.",
+                extractedData: { dateTime: this.requiredInfo.dateTime }
+            };
+        } else if (!this.requiredInfo.location) {
+            this.requiredInfo.location = this.extractLocation(input);
+            return {
+                message: "I've noted the location and police report information. Now, what items were stolen? Please be as specific as possible with descriptions, brands, models, and estimated values if you know them.",
+                extractedData: { location: this.requiredInfo.location }
+            };
+        } else if (!this.requiredInfo.stolenItems) {
+            this.requiredInfo.stolenItems = input;
+            return {
+                message: "Thank you for that detailed list. How did the thieves gain entry? Was there any damage to doors, windows, or locks? Do you have any security cameras or witnesses?",
+                extractedData: { stolenItems: input }
+            };
+        } else {
+            return {
+                message: "I have all the key information for your theft claim. This will be processed as a priority. Let me prepare the summary for your review and submission to our claims team.",
+                extractedData: { finalInfo: input }
+            };
+        }
+    }
+    
+    getFireQuestions(input) {
+        if (!this.requiredInfo.dateTime) {
+            this.requiredInfo.dateTime = this.extractDateTime(input);
+            return {
+                message: "Thank you. What caused the fire? Was it electrical, cooking-related, or something else? And what areas of your property were damaged?",
+                extractedData: { dateTime: this.requiredInfo.dateTime }
+            };
+        } else if (!this.requiredInfo.cause) {
+            this.requiredInfo.cause = this.extractFireCause(input);
+            return {
+                message: "I understand. Is your home still habitable, or do you need temporary housing? Also, do you have a fire department report number? This is crucial for processing your claim.",
+                extractedData: { cause: this.requiredInfo.cause }
+            };
+        } else if (!this.requiredInfo.habitability) {
+            this.requiredInfo.habitability = input;
+            return {
+                message: "Thank you for that information. Have you taken any steps to prevent further damage, like boarding up openings or covering damaged areas? Do you have photos of the damage?",
+                extractedData: { habitability: input }
+            };
+        } else {
+            return {
+                message: "I have comprehensive information about your fire damage claim. This is clearly a serious situation, and we'll expedite this claim. Let me prepare everything for immediate submission.",
+                extractedData: { finalInfo: input }
+            };
+        }
+    }
+    
+    getWaterDamageQuestions(input) {
+        if (!this.requiredInfo.dateTime) {
+            this.requiredInfo.dateTime = this.extractDateTime(input);
+            return {
+                message: "Thank you. What was the source of the water? Was it a burst pipe, storm damage, appliance malfunction, or something else? And which areas of your property were affected?",
+                extractedData: { dateTime: this.requiredInfo.dateTime }
+            };
+        } else if (!this.requiredInfo.source) {
+            this.requiredInfo.source = this.extractWaterSource(input);
+            return {
+                message: "I've noted the water source and affected areas. Have you been able to stop the water flow? Have you started any cleanup or hired a water restoration company? Time is critical with water damage.",
+                extractedData: { source: this.requiredInfo.source }
+            };
+        } else if (!this.requiredInfo.mitigation) {
+            this.requiredInfo.mitigation = input;
+            return {
+                message: "Good information about your mitigation efforts. Do you have photos or video of the damage? Are there any personal belongings that were damaged? Please describe the extent of the damage.",
+                extractedData: { mitigation: input }
+            };
+        } else {
+            return {
+                message: "I have all the essential details for your water damage claim. Given the urgency of water damage, we'll process this immediately. Let me prepare the complete summary for submission.",
+                extractedData: { finalInfo: input }
+            };
+        }
+    }
+    
+    // Helper methods for information extraction
+    extractDateTime(input) {
+        // Simple extraction - in production, use proper NLP
+        const lowerInput = input.toLowerCase();
+        if (lowerInput.includes('today')) return 'Today';
+        if (lowerInput.includes('yesterday')) return 'Yesterday';
+        if (lowerInput.includes('this morning')) return 'This morning';
+        if (lowerInput.includes('last night')) return 'Last night';
+        return input.substring(0, 100); // First part of input likely contains time info
+    }
+    
+    extractLocation(input) {
+        return input.substring(0, 200); // Assume location info is in the response
+    }
+    
+    extractVehicleInfo(input) {
+        return input.substring(0, 200);
+    }
+    
+    extractFireCause(input) {
+        return input.substring(0, 150);
+    }
+    
+    extractWaterSource(input) {
+        return input.substring(0, 150);
+    }
+        const conversationArea = document.getElementById('conversation-area');
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `message ${sender}-message`;
+        
+        const now = new Date().toLocaleTimeString();
+        messageDiv.innerHTML = `
+            <div class="message-content">
+                <strong>${sender === 'agent' ? 'Sarah' : 'You'}:</strong> ${content}
+            </div>
+            <div class="message-time">${now}</div>
+        `;
+        
+        conversationArea.appendChild(messageDiv);
+        conversationArea.scrollTop = conversationArea.scrollHeight;
+        
+        // Store in conversation history
+        this.conversation.push({
+            sender: sender,
+            content: content,
+            timestamp: now
+        });
+    }
+    
+    updateClaimSummary() {
+        const summaryDiv = document.getElementById('extracted-info');
+        let summaryHTML = '<div class="claim-info-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem;">';
+        
+        for (const [key, value] of Object.entries(this.claimData)) {
+            summaryHTML += `
+                <div class="info-item" style="padding: 1rem; background: rgba(52, 152, 219, 0.1); border-radius: 8px;">
+                    <strong>${key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}:</strong><br>
+                    ${value}
+                </div>
+            `;
+        }
+        
+        summaryHTML += '</div>';
+        summaryDiv.innerHTML = summaryHTML;
+        
+        document.getElementById('claim-summary').style.display = 'block';
+    }
+    
+    showTranscriptReview() {
+        const modal = document.getElementById('transcript-modal');
+        const transcriptDiv = document.getElementById('full-transcript');
+        
+        let transcriptHTML = '';
+        this.conversation.forEach(msg => {
+            transcriptHTML += `
+                <div style="margin-bottom: 1rem; padding: 0.5rem; border-left: 3px solid ${msg.sender === 'agent' ? '#667eea' : '#f5576c'};">
+                    <strong>${msg.sender === 'agent' ? 'Claims Assistant Sarah' : 'Policyholder'}:</strong> [${msg.timestamp}]<br>
+                    ${msg.content}
+                </div>
+            `;
+        });
+        
+        transcriptDiv.innerHTML = transcriptHTML;
+        modal.style.display = 'flex';
+    }
+    
+    async submitClaim() {
+        const confirmed = document.getElementById('transcript-confirmed').checked;
+        if (!confirmed) {
+            alert('Please confirm the transcript is accurate before submitting.');
+            return;
+        }
+        
+        // Prepare claim data for submission
+        const claimSubmission = {
+            claimData: this.claimData,
+            conversation: this.conversation,
+            timestamp: new Date().toISOString(),
+            submittedBy: 'FNOL AI Agent'
+        };
+        
+        try {
+            const response = await fetch('/api/submit-fnol', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(claimSubmission)
+            });
+            
+            if (response.ok) {
+                alert('Your claim has been successfully submitted! You will receive a confirmation email shortly.');
+                window.location.href = '/claim-confirmation';
+            } else {
+                throw new Error('Submission failed');
+            }
+        } catch (error) {
+            console.error('Submission error:', error);
+            alert('There was an error submitting your claim. Please try again or contact support.');
+        }
+    }
+}
+
+// Global functions
+function closeTranscriptModal() {
+    document.getElementById('transcript-modal').style.display = 'none';
+}
+
+// Initialize FNOL Agent when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM loaded, initializing FNOL Agent...');
+    
+    try {
+        window.fnolAgent = new FNOLAgent();
+        console.log('FNOL Agent initialized successfully');
+    } catch (error) {
+        console.error('Error initializing FNOL Agent:', error);
+        alert('Error initializing FNOL Agent: ' + error.message);
+    }
+});
+</script>
+{% endblock %}

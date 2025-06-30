@@ -1,0 +1,146 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="stepper">
+    <div class="step completed">
+        <i class="fas fa-upload"></i>
+        <span>Upload Policy</span>
+    </div>
+    <div class="step active">
+        <i class="fas fa-calculator"></i>
+        <span>Review Quote</span>
+    </div>
+    <div class="step">
+        <i class="fas fa-piggy-bank"></i>
+        <span>Optimize Savings</span>
+    </div>
+</div>
+
+<div id="quote-content">
+    <!-- Content will be populated by JavaScript -->
+</div>
+
+<div class="text-center mt-2">
+    <a href="/" class="btn btn-secondary">
+        <i class="fas fa-arrow-left"></i> Upload New Document
+    </a>
+    <a href="/tips" class="btn btn-success btn-large" style="margin-left: 1rem;">
+        <i class="fas fa-arrow-right"></i> Discover More Savings
+    </a>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const quoteData = getQuoteData();
+    
+    if (!quoteData) {
+        document.getElementById('quote-content').innerHTML = `
+            <div class="card">
+                <div class="alert alert-error">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    No quote data available. Please upload a policy document first.
+                </div>
+                <div class="text-center">
+                    <a href="/" class="btn btn-large">
+                        <i class="fas fa-upload"></i> Upload Policy Document
+                    </a>
+                </div>
+            </div>
+        `;
+        return;
+    }
+
+    const { policy_info, quote } = quoteData;
+    
+    document.getElementById('quote-content').innerHTML = `
+        <div class="card">
+            <h2 class="text-center mb-2">Your Personalized Quote Results</h2>
+            
+            <div class="grid grid-2">
+                <!-- Main Quote Card -->
+                <div>
+                    <div class="card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                            <h3>New Quote for ${policy_info.coverage_type || 'Insurance'}</h3>
+                            <span style="background: rgba(255,255,255,0.2); padding: 0.5rem 1rem; border-radius: 20px;">
+                                <i class="fas fa-bolt"></i> Instant Quote
+                            </span>
+                        </div>
+                        
+                        <div class="grid grid-2" style="margin-bottom: 1rem;">
+                            <div>
+                                <p style="opacity: 0.8;">Original Quote</p>
+                                <h2 style="text-decoration: line-through; opacity: 0.7;">$${quote.base_quote}</h2>
+                            </div>
+                            <div>
+                                <p style="opacity: 0.8;">Your Price with Discounts</p>
+                                <h1 style="font-size: 3rem; font-weight: bold;">$${quote.discounted_quote}</h1>
+                                <p style="opacity: 0.8;">/year</p>
+                            </div>
+                        </div>
+
+                        <div style="background: rgba(39, 174, 96, 0.3); padding: 1rem; border-radius: 10px;">
+                            <div style="display: flex; align-items: center;">
+                                <i class="fas fa-trending-down" style="margin-right: 0.5rem; font-size: 1.5rem;"></i>
+                                <h3>You Save $${quote.savings} per year (${quote.total_discount}% off)</h3>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Applied Discounts -->
+                    <div class="card">
+                        <h3 class="mb-1"><i class="fas fa-tags"></i> Applied Discounts</h3>
+                        ${quote.applicable_discounts.map(discount => `
+                            <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0; border-bottom: 1px solid #eee;">
+                                <div>
+                                    <h4 style="color: #27ae60;"><i class="fas fa-check-circle"></i> ${discount.name}</h4>
+                                    <p style="color: #7f8c8d; margin: 0;">${discount.description}</p>
+                                </div>
+                                <span style="color: #27ae60; font-weight: bold; font-size: 1.1rem;">
+                                    -${Math.round(discount.discount * 100)}%
+                                </span>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+
+                <!-- Policy Information -->
+                <div>
+                    <div class="card">
+                        <h3 class="mb-1"><i class="fas fa-file-alt"></i> Extracted Policy Information</h3>
+                        ${Object.entries(policy_info).map(([key, value]) => {
+                            if (!value) return '';
+                            const displayKey = key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+                            const displayValue = key === 'current_premium' ? `$${value}` : value;
+                            return `
+                                <div style="margin-bottom: 0.5rem;">
+                                    <p style="color: #7f8c8d; margin: 0; font-size: 0.9rem;">${displayKey}</p>
+                                    <p style="font-weight: 600; margin: 0;">${displayValue}</p>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+
+                    <!-- Quick Stats -->
+                    <div class="card" style="background: rgba(52, 152, 219, 0.1);">
+                        <h3 class="mb-1"><i class="fas fa-chart-bar"></i> Quote Summary</h3>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                            <span>Coverage Type:</span>
+                            <strong>${policy_info.coverage_type || 'N/A'}</strong>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                            <span>Discounts Applied:</span>
+                            <strong>${quote.applicable_discounts.length}</strong>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                            <span>Total Savings:</span>
+                            <strong style="color: #27ae60;">$${quote.savings}</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+});
+</script>
+{% endblock %}
