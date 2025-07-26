@@ -67,6 +67,51 @@
     </div>
 </div>
 
+<!-- Floating Chat Widget -->
+<div id="chatWidget" class="chat-widget">
+    <div id="chatToggle" class="chat-toggle" onclick="toggleChat()">
+        <i class="fas fa-robot"></i>
+        <span class="chat-badge" id="chatBadge">AI</span>
+    </div>
+    
+    <div id="chatWindow" class="chat-window" style="display: none;">
+        <div class="chat-header">
+            <div class="chat-title">
+                <i class="fas fa-robot"></i>
+                <span>AI Assistant</span>
+            </div>
+            <div class="chat-controls">
+                <span class="language-indicator" id="widgetLanguageIndicator">🇺🇸 EN</span>
+                <button onclick="toggleChat()" class="chat-close">×</button>
+            </div>
+        </div>
+        
+        <div class="chat-messages" id="widgetChatMessages">
+            <div class="message bot">
+                <div class="message-avatar">🤖</div>
+                <div class="message-content">
+                    <strong>Hello! I can help with your claim.</strong><br><br>
+                    I can assist you with:<br>
+                    • 🔍 Claim status updates<br>
+                    • 💳 Payment information<br>
+                    • 📋 Policy details<br>
+                    • 📖 Coverage explanations<br><br>
+                    <em>Ask me anything in any language!</em>
+                </div>
+            </div>
+        </div>
+        
+        <div class="chat-input-container">
+            <div class="chat-input-wrapper">
+                <input type="text" id="widgetChatInput" class="chat-input" placeholder="Type your message in any language..." onkeypress="handleWidgetKeyPress(event)">
+                <button id="widgetSendButton" class="send-button" onclick="sendWidgetMessage()">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
 console.log('🚀 Simple FNOL script loading...');
 
@@ -269,5 +314,114 @@ document.addEventListener('DOMContentLoaded', function() {
     
     console.log('✅ Simple FNOL initialized');
 });
+
+// Floating Chat Widget Functions
+let chatOpen = false;
+
+function toggleChat() {
+    const chatWindow = document.getElementById('chatWindow');
+    const chatToggle = document.getElementById('chatToggle');
+    
+    chatOpen = !chatOpen;
+    
+    if (chatOpen) {
+        chatWindow.style.display = 'flex';
+        chatToggle.style.transform = 'rotate(180deg)';
+        document.getElementById('widgetChatInput').focus();
+    } else {
+        chatWindow.style.display = 'none';
+        chatToggle.style.transform = 'rotate(0deg)';
+    }
+}
+
+function handleWidgetKeyPress(event) {
+    if (event.key === 'Enter') {
+        sendWidgetMessage();
+    }
+}
+
+async function sendWidgetMessage() {
+    const input = document.getElementById('widgetChatInput');
+    const sendButton = document.getElementById('widgetSendButton');
+    const messagesContainer = document.getElementById('widgetChatMessages');
+    const languageIndicator = document.getElementById('widgetLanguageIndicator');
+    
+    const message = input.value.trim();
+    if (!message) return;
+
+    // Disable input while processing
+    input.disabled = true;
+    sendButton.disabled = true;
+    
+    // Add user message
+    addWidgetMessage(message, true);
+    input.value = '';
+    
+    try {
+        const response = await fetch('/api/chat', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                message: message,
+                customer_id: '12345' // Mock customer ID
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            // Add bot response
+            addWidgetMessage(data.response, false);
+            
+            // Update language indicator
+            if (data.detected_language) {
+                const languageFlags = {
+                    'en': '🇺🇸 EN',
+                    'hi': '🇮🇳 HI',
+                    'es': '🇪🇸 ES',
+                    'fr': '🇫🇷 FR',
+                    'zh': '🇨🇳 ZH',
+                    'ar': '🇸🇦 AR',
+                    'ja': '🇯🇵 JA'
+                };
+                const langDisplay = languageFlags[data.detected_language] || `${data.detected_language.toUpperCase()}`;
+                languageIndicator.textContent = langDisplay;
+            }
+        } else {
+            addWidgetMessage('Sorry, I encountered an error. Please try again.', false);
+        }
+    } catch (error) {
+        addWidgetMessage('Sorry, I\'m having trouble connecting. Please try again.', false);
+        console.error('Chat error:', error);
+    }
+    
+    // Re-enable input
+    input.disabled = false;
+    sendButton.disabled = false;
+    input.focus();
+}
+
+function addWidgetMessage(content, isUser = false) {
+    const messagesContainer = document.getElementById('widgetChatMessages');
+    
+    const messageDiv = document.createElement('div');
+    messageDiv.className = `message ${isUser ? 'user' : 'bot'}`;
+    
+    const avatar = document.createElement('div');
+    avatar.className = 'message-avatar';
+    avatar.textContent = isUser ? '👤' : '🤖';
+    
+    const messageContent = document.createElement('div');
+    messageContent.className = 'message-content';
+    messageContent.innerHTML = content.replace(/\n/g, '<br>');
+    
+    messageDiv.appendChild(avatar);
+    messageDiv.appendChild(messageContent);
+    
+    messagesContainer.appendChild(messageDiv);
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+}
 </script>
 {% endblock %}

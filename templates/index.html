@@ -78,6 +78,51 @@
             <!-- Animated Processing Icon -->
             <div style="position: relative; margin-bottom: 2rem;">
                 <i class="fas fa-file-alt" style="font-size: 4rem; color: #3498db; opacity: 0.3;"></i>
+
+    <!-- Floating Chat Widget -->
+    <div id="chatWidget" class="chat-widget">
+        <div id="chatToggle" class="chat-toggle" onclick="toggleChat()">
+            <i class="fas fa-robot"></i>
+            <span class="chat-badge" id="chatBadge">AI</span>
+        </div>
+        
+        <div id="chatWindow" class="chat-window" style="display: none;">
+            <div class="chat-header">
+                <div class="chat-title">
+                    <i class="fas fa-robot"></i>
+                    <span>AI Assistant</span>
+                </div>
+                <div class="chat-controls">
+                    <span class="language-indicator" id="widgetLanguageIndicator">🇺🇸 EN</span>
+                    <button onclick="toggleChat()" class="chat-close">×</button>
+                </div>
+            </div>
+            
+            <div class="chat-messages" id="widgetChatMessages">
+                <div class="message bot">
+                    <div class="message-avatar">🤖</div>
+                    <div class="message-content">
+                        <strong>Hello! I'm your insurance assistant.</strong><br><br>
+                        I can help you with:<br>
+                        • 💳 Bill payments<br>
+                        • 📋 Policy information<br>
+                        • 🔍 Claim status<br>
+                        • 📖 Coverage explanations<br><br>
+                        <em>Ask me anything in any language!</em>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="chat-input-container">
+                <div class="chat-input-wrapper">
+                    <input type="text" id="widgetChatInput" class="chat-input" placeholder="Type your message in any language..." onkeypress="handleWidgetKeyPress(event)">
+                    <button id="widgetSendButton" class="send-button" onclick="sendWidgetMessage()">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
                 <i class="fas fa-search" id="scanning-icon" style="font-size: 2rem; color: #27ae60; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); animation: pulse 1.5s infinite;"></i>
             </div>
             
@@ -667,6 +712,115 @@ document.addEventListener('DOMContentLoaded', function() {
             closeCamera();
             handleFileSelection(file);
         }, 'image/jpeg', 0.8);
+    };
+
+    // Floating Chat Widget Functions
+    let chatOpen = false;
+
+    window.toggleChat = function() {
+        const chatWindow = document.getElementById('chatWindow');
+        const chatToggle = document.getElementById('chatToggle');
+        
+        chatOpen = !chatOpen;
+        
+        if (chatOpen) {
+            chatWindow.style.display = 'flex';
+            chatToggle.style.transform = 'rotate(180deg)';
+            document.getElementById('widgetChatInput').focus();
+        } else {
+            chatWindow.style.display = 'none';
+            chatToggle.style.transform = 'rotate(0deg)';
+        }
+    };
+
+    window.handleWidgetKeyPress = function(event) {
+        if (event.key === 'Enter') {
+            sendWidgetMessage();
+        }
+    };
+
+    window.sendWidgetMessage = async function() {
+        const input = document.getElementById('widgetChatInput');
+        const sendButton = document.getElementById('widgetSendButton');
+        const messagesContainer = document.getElementById('widgetChatMessages');
+        const languageIndicator = document.getElementById('widgetLanguageIndicator');
+        
+        const message = input.value.trim();
+        if (!message) return;
+
+        // Disable input while processing
+        input.disabled = true;
+        sendButton.disabled = true;
+        
+        // Add user message
+        addWidgetMessage(message, true);
+        input.value = '';
+        
+        try {
+            const response = await fetch('/api/chat', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    message: message,
+                    customer_id: '12345' // Mock customer ID
+                })
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                // Add bot response
+                addWidgetMessage(data.response, false);
+                
+                // Update language indicator
+                if (data.detected_language) {
+                    const languageFlags = {
+                        'en': '🇺🇸 EN',
+                        'hi': '🇮🇳 HI',
+                        'es': '🇪🇸 ES',
+                        'fr': '🇫🇷 FR',
+                        'zh': '🇨🇳 ZH',
+                        'ar': '🇸🇦 AR',
+                        'ja': '🇯🇵 JA'
+                    };
+                    const langDisplay = languageFlags[data.detected_language] || `${data.detected_language.toUpperCase()}`;
+                    languageIndicator.textContent = langDisplay;
+                }
+            } else {
+                addWidgetMessage('Sorry, I encountered an error. Please try again.', false);
+            }
+        } catch (error) {
+            addWidgetMessage('Sorry, I\'m having trouble connecting. Please try again.', false);
+            console.error('Chat error:', error);
+        }
+        
+        // Re-enable input
+        input.disabled = false;
+        sendButton.disabled = false;
+        input.focus();
+    };
+
+    window.addWidgetMessage = function(content, isUser = false) {
+        const messagesContainer = document.getElementById('widgetChatMessages');
+        
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `message ${isUser ? 'user' : 'bot'}`;
+        
+        const avatar = document.createElement('div');
+        avatar.className = 'message-avatar';
+        avatar.textContent = isUser ? '👤' : '🤖';
+        
+        const messageContent = document.createElement('div');
+        messageContent.className = 'message-content';
+        messageContent.innerHTML = content.replace(/\n/g, '<br>');
+        
+        messageDiv.appendChild(avatar);
+        messageDiv.appendChild(messageContent);
+        
+        messagesContainer.appendChild(messageDiv);
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
     };
 });
 </script>
