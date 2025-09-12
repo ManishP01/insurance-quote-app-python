@@ -38,7 +38,7 @@ class AIInsuranceBot:
         message_lower = message.lower()
         
         # Scenario-based questions (check FIRST before coverage explanations)
-        if any(phrase in message_lower for phrase in ['will i be covered', 'am i covered', 'does my insurance cover', 'what if', 'if i', 'would i be covered']):
+        if any(phrase in message_lower for phrase in ['will i be covered', 'am i covered', 'does my insurance cover', 'will the policy cover', 'will my policy cover', 'what if', 'if i', 'would i be covered']):
             return 'coverage_scenario', {'scenario': message}
         
         # Coverage explanation intents
@@ -68,6 +68,14 @@ class AIInsuranceBot:
                 return 'payment_methods', {}
             else:
                 return 'bill_general', {}
+        
+        # Premium questions (separate from bill questions)
+        if any(phrase in message_lower for phrase in ['my premium', 'what is premium', 'premium is', 'cost of premium']):
+            return 'bill_amount', {}
+        
+        # Policy renewal and expiration
+        if any(phrase in message_lower for phrase in ['when will my policy', 'when does my policy renew', 'policy renewal', 'policy expires', 'renewal date', 'expiration date', 'policy be renewed']):
+            return 'policy_renewal', {}
         
         # Premium and rate questions
         if any(phrase in message_lower for phrase in ['premium went up', 'rate increase', 'why did my premium', 'cost more']):
@@ -120,6 +128,7 @@ class AIInsuranceBot:
             'payment_methods': self.handle_payment_methods,
             'bill_general': self.handle_bill_general,
             'premium_increase': self.handle_premium_increase,
+            'policy_renewal': self.handle_policy_renewal,
             'explain_term': self.handle_term_explanation,
             'coverage_change': self.handle_coverage_change,
             'claims_info': self.handle_claims_info
@@ -150,15 +159,24 @@ class AIInsuranceBot:
             
             for coverage, details in coverages.items():
                 if coverage == 'liability':
-                    response += f"🛡️ **Liability Coverage**: {details['bodily_injury']} bodily injury, {details['property_damage']} property damage\n"
+                    if 'bodily_injury' in details:  # Auto insurance
+                        response += f"🛡️ **Liability Coverage**: {details['bodily_injury']} bodily injury, {details['property_damage']} property damage\n"
+                    else:  # Home insurance
+                        response += f"🛡️ **Liability Coverage**: {details['coverage_limit']}\n"
                 elif coverage == 'collision':
-                    response += f"🚗 **Collision Coverage**: {details['coverage_limit']} limit with ${details['deductible']} deductible\n"
+                    response += f"🚗 **Collision Coverage**: {details['coverage_limit']} limit with {details['deductible']} deductible\n"
                 elif coverage == 'comprehensive':
-                    response += f"🌟 **Comprehensive Coverage**: {details['coverage_limit']} limit with ${details['deductible']} deductible\n"
+                    response += f"🌟 **Comprehensive Coverage**: {details['coverage_limit']} limit with {details['deductible']} deductible\n"
                 elif coverage == 'dwelling':
                     response += f"🏠 **Dwelling Coverage**: {details['coverage_limit']} to rebuild your home\n"
                 elif coverage == 'personal_property':
                     response += f"📦 **Personal Property**: {details['coverage_limit']} for your belongings\n"
+                elif coverage == 'uninsured_motorist':
+                    response += f"🛡️ **Uninsured Motorist**: {details['bodily_injury']} bodily injury protection\n"
+                elif coverage == 'medical_payments':
+                    response += f"🏥 **Medical Payments**: {details['coverage_limit']} for medical expenses\n"
+                elif coverage == 'loss_of_use':
+                    response += f"🏨 **Loss of Use**: {details['coverage_limit']} for temporary housing\n"
             
             return {
                 'response': response,
@@ -396,6 +414,31 @@ class AIInsuranceBot:
             'response': response,
             'intent': 'premium_increase',
             'supporting_document': 'Policy Terms - Premium Calculation',
+            'connect_to_agent': False
+        }
+    
+    def handle_policy_renewal(self, customer: Dict, params: Dict) -> Dict:
+        """Handle policy renewal questions"""
+        policy = customer['policy_details']
+        customer_name = customer['personal_info']['name']
+        
+        response = f"📅 **Policy Renewal Information for {customer_name}:**\n\n"
+        response += f"🗓️ **Current Policy Period**: {policy['policy_start']} to {policy['policy_end']}\n"
+        response += f"🔄 **Renewal Date**: {policy['policy_end']}\n"
+        response += f"💰 **Current Premium**: ${policy['premium_amount']:.2f}\n\n"
+        
+        response += f"**What happens at renewal:**\n"
+        response += f"• We'll review your policy 30 days before expiration\n"
+        response += f"• You'll receive renewal documents by mail and email\n"
+        response += f"• Premium may change based on claims, coverage changes, or market rates\n"
+        response += f"• Policy automatically renews unless you cancel\n\n"
+        
+        response += f"📞 **Questions about renewal?** Call us at (555) 123-4567"
+        
+        return {
+            'response': response,
+            'intent': 'policy_renewal',
+            'supporting_document': 'Policy Terms - Renewal Process',
             'connect_to_agent': False
         }
     

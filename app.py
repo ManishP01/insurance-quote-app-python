@@ -420,10 +420,10 @@ def chat_api():
         
         # Try AI bot first for insurance-specific queries
         try:
-            # Use OpenAI-enhanced bot if available
+            # Use Smart OpenAI approach if available
             if os.getenv('OPENAI_API_KEY'):
-                from ai_insurance_bot_openai import AIInsuranceBotOpenAI
-                ai_bot = AIInsuranceBotOpenAI()
+                from ai_insurance_bot_smart import SmartAIInsuranceBot
+                ai_bot = SmartAIInsuranceBot()
             else:
                 from ai_insurance_bot import AIInsuranceBot
                 ai_bot = AIInsuranceBot()
@@ -438,7 +438,7 @@ def chat_api():
                     'intent': bot_response['intent'],
                     'supporting_document': bot_response['supporting_document'],
                     'connect_to_agent': bot_response['connect_to_agent'],
-                    'translation_method': bot_response.get('translation_method', 'ai_insurance_bot')
+                    'translation_method': bot_response.get('translation_method', 'smart_openai')
                 })
         except Exception as e:
             print(f"AI bot error: {e}")
