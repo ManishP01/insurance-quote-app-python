@@ -7,6 +7,10 @@ import json
 from werkzeug.utils import secure_filename
 import tempfile
 import random
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
 
 # Import OCR processor
 try:
@@ -416,19 +420,25 @@ def chat_api():
         
         # Try AI bot first for insurance-specific queries
         try:
-            from ai_insurance_bot import AIInsuranceBot
-            ai_bot = AIInsuranceBot()
+            # Use OpenAI-enhanced bot if available
+            if os.getenv('OPENAI_API_KEY'):
+                from ai_insurance_bot_openai import AIInsuranceBotOpenAI
+                ai_bot = AIInsuranceBotOpenAI()
+            else:
+                from ai_insurance_bot import AIInsuranceBot
+                ai_bot = AIInsuranceBot()
+            
             bot_response = ai_bot.handle_query(message, customer_id)
             
             if bot_response['intent'] != 'unknown':
                 return jsonify({
                     'success': True,
                     'response': bot_response['response'],
-                    'detected_language': 'en',
+                    'detected_language': bot_response.get('detected_language', 'en'),
                     'intent': bot_response['intent'],
                     'supporting_document': bot_response['supporting_document'],
                     'connect_to_agent': bot_response['connect_to_agent'],
-                    'translation_method': 'ai_insurance_bot'
+                    'translation_method': bot_response.get('translation_method', 'ai_insurance_bot')
                 })
         except Exception as e:
             print(f"AI bot error: {e}")

@@ -59,10 +59,10 @@ class AIInsuranceBot:
                 return 'explain_coverage', {'coverage_type': 'general'}
         
         # Bill and payment intents
-        if any(word in message_lower for word in ['bill', 'payment', 'due', 'pay', 'amount owed']):
+        if any(word in message_lower for word in ['bill', 'payment', 'due', 'pay', 'amount owed', 'premium amount', 'premium cost']):
             if any(word in message_lower for word in ['when', 'due date', 'next']):
                 return 'bill_due_date', {}
-            elif any(word in message_lower for word in ['how much', 'amount', 'cost']):
+            elif any(word in message_lower for word in ['how much', 'amount', 'cost', 'premium amount']):
                 return 'bill_amount', {}
             elif any(word in message_lower for word in ['method', 'how to pay', 'payment options']):
                 return 'payment_methods', {}

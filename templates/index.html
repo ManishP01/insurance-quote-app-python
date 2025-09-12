@@ -235,13 +235,19 @@ async function sendMessage() {
     sendButton.disabled = true;
     sendButton.innerHTML = '<div class="loading-spinner"></div>';
     
+    // Get selected customer with debugging
+    const customerSelect = document.getElementById('customerSelect');
+    const customerId = customerSelect ? customerSelect.value : '67890';
+    console.log('Customer select element:', customerSelect);
+    console.log('Selected customer ID:', customerId);
+    
     try {
         const response = await fetch('/api/chat', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 message: message,
-                customer_id: document.getElementById('customerSelect').value || '12345'
+                customer_id: customerId
             })
         });
         
