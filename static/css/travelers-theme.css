@@ -635,6 +635,11 @@ body {
     border-radius: 25px;
     font-size: 14px;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    min-height: 20px;
+    max-height: 120px;
+    resize: none;
+    overflow-y: auto;
+    line-height: 1.4;
 }
 
 .travelers-chat-input input:focus {
@@ -650,4 +655,22 @@ body {
 
 .travelers-chat-input button:hover {
     transform: scale(1.05);
+}
+/* Full Width Chat Input Fix */
+.chat-input-container {
+    display: flex !important;
+    gap: 8px !important;
+    align-items: flex-end !important;
+    width: 100% !important;
+}
+
+.chat-input {
+    flex: 1 !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+}
+
+.chat-input-wrapper {
+    width: 100% !important;
+    flex: 1 !important;
 }
