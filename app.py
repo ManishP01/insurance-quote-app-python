@@ -148,18 +148,40 @@ def analyze_policy_document(text):
             analysis['confidence'] += 0.2
             break
     
-    # Extract carrier
-    carriers = ['state farm', 'geico', 'progressive', 'allstate', 'farmers', 'usaa', 'liberty mutual']
+    # Extract carrier - expanded list
+    carriers = [
+        'state farm', 'geico', 'progressive', 'allstate', 'farmers', 'usaa', 'liberty mutual',
+        'travelers', 'nationwide', 'american family', 'auto-owners', 'country financial',
+        'erie', 'amica', 'csaa', 'mercury', 'safeco', 'the general', 'esurance',
+        'metlife', 'hartford', 'chubb', 'aig', 'zurich', 'aaa', 'mutual'
+    ]
     for carrier in carriers:
         if carrier in text_lower:
             analysis['carrier'] = carrier.title()
             analysis['confidence'] += 0.1
             break
     
+    # Also check for common insurance company patterns
+    carrier_patterns = [
+        r'insurance\s+company[:\s]*([A-Za-z\s]+)',
+        r'carrier[:\s]*([A-Za-z\s]+)',
+        r'insurer[:\s]*([A-Za-z\s]+)',
+        r'underwritten\s+by[:\s]*([A-Za-z\s]+)'
+    ]
+    
+    for pattern in carrier_patterns:
+        match = re.search(pattern, text, re.IGNORECASE)
+        if match and not analysis['carrier']:
+            carrier_name = match.group(1).strip()
+            if len(carrier_name) > 2 and len(carrier_name) < 50:
+                analysis['carrier'] = carrier_name
+                analysis['confidence'] += 0.1
+                break
+    
     return analysis
 
 def calculate_competitive_quote(analysis):
-    """Calculate competitive quote based on policy analysis"""
+    """Calculate competitive quote with detailed coverage comparison"""
     if analysis['policy_type'] == 'Unknown':
         return None
     
@@ -170,20 +192,82 @@ def calculate_competitive_quote(analysis):
     base_rate = INSURANCE_RATES[policy_type]['base']
     current_premium = analysis['current_premium']
     
-    # Apply some competitive factors
+    # Apply competitive factors
     competitive_factor = random.uniform(0.85, 0.95)  # 5-15% savings
     new_quote = base_rate * competitive_factor
     
     savings = max(0, current_premium - new_quote)
     savings_percent = (savings / current_premium * 100) if current_premium > 0 else 0
     
+    # Generate detailed coverage comparison
+    if policy_type == 'auto':
+        current_coverage = {
+            'liability': {'limit': '$50,000', 'premium': round(current_premium * 0.4, 2)},
+            'collision': {'limit': '$25,000', 'premium': round(current_premium * 0.3, 2)},
+            'comprehensive': {'limit': '$15,000', 'premium': round(current_premium * 0.2, 2)},
+            'uninsured_motorist': {'limit': '$25,000', 'premium': round(current_premium * 0.1, 2)}
+        }
+        
+        our_coverage = {
+            'liability': {'limit': '$100,000', 'premium': round(new_quote * 0.4, 2)},
+            'collision': {'limit': '$50,000', 'premium': round(new_quote * 0.3, 2)},
+            'comprehensive': {'limit': '$25,000', 'premium': round(new_quote * 0.2, 2)},
+            'uninsured_motorist': {'limit': '$50,000', 'premium': round(new_quote * 0.1, 2)}
+        }
+    else:  # home insurance
+        current_coverage = {
+            'dwelling': {'limit': '$200,000', 'premium': round(current_premium * 0.5, 2)},
+            'personal_property': {'limit': '$100,000', 'premium': round(current_premium * 0.25, 2)},
+            'liability': {'limit': '$100,000', 'premium': round(current_premium * 0.15, 2)},
+            'medical_payments': {'limit': '$5,000', 'premium': round(current_premium * 0.1, 2)}
+        }
+        
+        our_coverage = {
+            'dwelling': {'limit': '$250,000', 'premium': round(new_quote * 0.5, 2)},
+            'personal_property': {'limit': '$125,000', 'premium': round(new_quote * 0.25, 2)},
+            'liability': {'limit': '$300,000', 'premium': round(new_quote * 0.15, 2)},
+            'medical_payments': {'limit': '$10,000', 'premium': round(new_quote * 0.1, 2)}
+        }
+    
     return {
         'new_quote': round(new_quote, 2),
         'current_premium': current_premium,
         'savings': round(savings, 2),
         'savings_percent': round(savings_percent, 1),
-        'policy_type': analysis['policy_type']
+        'policy_type': analysis['policy_type'],
+        'current_coverage': current_coverage,
+        'our_coverage': our_coverage,
+        'coverage_improvements': calculate_coverage_improvements(current_coverage, our_coverage)
     }
+
+def calculate_coverage_improvements(current, our):
+    """Calculate coverage improvements"""
+    improvements = []
+    
+    for coverage_type in current.keys():
+        if coverage_type in our:
+            current_limit = int(current[coverage_type]['limit'].replace('$', '').replace(',', ''))
+            our_limit = int(our[coverage_type]['limit'].replace('$', '').replace(',', ''))
+            
+            if our_limit > current_limit:
+                increase = our_limit - current_limit
+                improvements.append({
+                    'type': coverage_type.replace('_', ' ').title(),
+                    'current': current[coverage_type]['limit'],
+                    'our': our[coverage_type]['limit'],
+                    'increase': f'${increase:,}',
+                    'improvement': True
+                })
+            else:
+                improvements.append({
+                    'type': coverage_type.replace('_', ' ').title(),
+                    'current': current[coverage_type]['limit'],
+                    'our': our[coverage_type]['limit'],
+                    'increase': 'Same',
+                    'improvement': False
+                })
+    
+    return improvements
 
 @app.route('/')
 def index():
@@ -219,7 +303,7 @@ def upload_file():
                 if not OCR_AVAILABLE:
                     return jsonify({'success': False, 'error': 'OCR not available for image processing'})
                 
-                result = ocr_processor.process_insurance_document(temp_path)
+                result = ocr_processor.process_document(temp_path)
                 if not result['success']:
                     return jsonify({'success': False, 'error': result['error']})
                 
@@ -318,15 +402,8 @@ def chatbot_page():
 
 @app.route('/api/chat', methods=['POST'])
 def chat_api():
-    """API endpoint for multilingual chatbot"""
+    """Enhanced API endpoint with AI insurance bot"""
     try:
-        if not CHATBOT_AVAILABLE:
-            return jsonify({
-                'success': False,
-                'error': 'Chatbot not available',
-                'message': 'Multilingual chatbot is not properly configured'
-            }), 500
-        
         data = request.json
         message = data.get('message', '')
         customer_id = data.get('customer_id', '12345')
@@ -337,10 +414,37 @@ def chat_api():
                 'error': 'No message provided'
             }), 400
         
-        # Process message through multilingual chatbot
-        response = chatbot.process_message(message, customer_id)
+        # Try AI bot first for insurance-specific queries
+        try:
+            from ai_insurance_bot import AIInsuranceBot
+            ai_bot = AIInsuranceBot()
+            bot_response = ai_bot.handle_query(message, customer_id)
+            
+            if bot_response['intent'] != 'unknown':
+                return jsonify({
+                    'success': True,
+                    'response': bot_response['response'],
+                    'detected_language': 'en',
+                    'intent': bot_response['intent'],
+                    'supporting_document': bot_response['supporting_document'],
+                    'connect_to_agent': bot_response['connect_to_agent'],
+                    'translation_method': 'ai_insurance_bot'
+                })
+        except Exception as e:
+            print(f"AI bot error: {e}")
         
-        # Get the last conversation entry for metadata
+        # Fall back to multilingual chatbot
+        if not CHATBOT_AVAILABLE:
+            return jsonify({
+                'success': True,
+                'response': 'Hello! I can help you with basic questions. For detailed insurance information, please contact our customer service.',
+                'detected_language': 'en',
+                'intent': 'general',
+                'translation_method': 'fallback'
+            })
+        
+        # Process through multilingual chatbot
+        response = chatbot.process_message(message, customer_id)
         last_conversation = chatbot.conversation_history[-1] if chatbot.conversation_history else {}
         
         return jsonify({
@@ -348,17 +452,18 @@ def chat_api():
             'response': response,
             'detected_language': last_conversation.get('detected_language', 'en'),
             'intent': last_conversation.get('intent', 'general_inquiry'),
-            'english_translation': last_conversation.get('user_message_english', message),
-            'translation_method': CHATBOT_TYPE.lower() if CHATBOT_TYPE else 'none'
+            'translation_method': CHATBOT_TYPE.lower() if CHATBOT_TYPE else 'multilingual'
         })
         
     except Exception as e:
         print(f"❌ Chat API error: {str(e)}")
         return jsonify({
-            'success': False,
-            'error': 'Chat processing failed',
-            'message': str(e)
-        }), 500
+            'success': True,
+            'response': 'I apologize, but I\'m having technical difficulties. Please contact customer service for assistance.',
+            'detected_language': 'en',
+            'intent': 'error',
+            'translation_method': 'fallback'
+        })
 
 @app.route('/api/chat/history', methods=['GET'])
 def chat_history():

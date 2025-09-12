@@ -1,0 +1,653 @@
+/* Travelers.com Inspired Theme for InsureQuote Pro */
+
+/* Color Variables - Matching Travelers Brand */
+:root {
+    /* Primary Colors */
+    --travelers-red: #e01719;
+    --travelers-dark-blue: #002d4b;
+    --travelers-light-blue: #007395;
+    --travelers-navy: #131517;
+    
+    /* Neutral Colors */
+    --travelers-dark-gray: #272a2d;
+    --travelers-medium-gray: #66869a;
+    --travelers-light-gray: #f2f5f7;
+    --travelers-white: #ffffff;
+    
+    /* Background Colors */
+    --travelers-hero-bg: #002d4b;
+    --travelers-card-bg: #f2f5f7;
+    --travelers-header-bg: #131517;
+    
+    /* Text Colors */
+    --travelers-heading-color: #272a2d;
+    --travelers-body-color: #272a2d;
+    --travelers-link-color: #007395;
+    
+    /* Button Colors */
+    --travelers-btn-primary: #e01719;
+    --travelers-btn-secondary: #007395;
+    --travelers-btn-hover: #c01315;
+}
+
+/* Typography - Travelers Font Stack */
+@import url('https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@300;400;600;700&display=swap');
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Source Sans Pro', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-size: 16px;
+    line-height: 1.5;
+    color: var(--travelers-body-color);
+    background-color: var(--travelers-white);
+    margin: 0;
+    padding: 0;
+}
+
+/* Header Styling - Travelers Style */
+.travelers-header {
+    background-color: var(--travelers-header-bg);
+    color: var(--travelers-white);
+    padding: 0;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.travelers-nav {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 2rem;
+}
+
+.travelers-logo {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--travelers-white);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+}
+
+.travelers-logo::before {
+    content: "🛡️";
+    margin-right: 0.5rem;
+    font-size: 2rem;
+}
+
+.travelers-nav-links {
+    display: flex;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    gap: 2rem;
+}
+
+.travelers-nav-links a {
+    color: var(--travelers-white);
+    text-decoration: none;
+    font-weight: 400;
+    padding: 0.5rem 0;
+    transition: color 0.3s ease;
+}
+
+.travelers-nav-links a:hover {
+    color: var(--travelers-light-blue);
+}
+
+/* Hero Section - Travelers Style */
+.travelers-hero {
+    background: linear-gradient(135deg, var(--travelers-dark-blue) 0%, var(--travelers-navy) 100%);
+    color: var(--travelers-white);
+    padding: 4rem 2rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.travelers-hero::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="1"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+    opacity: 0.3;
+}
+
+.travelers-hero-content {
+    max-width: 800px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+}
+
+.travelers-hero h1 {
+    font-size: 3rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    line-height: 1.2;
+}
+
+.travelers-hero p {
+    font-size: 1.25rem;
+    margin-bottom: 2rem;
+    opacity: 0.9;
+}
+
+/* Buttons - Travelers Style */
+.travelers-btn {
+    display: inline-block;
+    padding: 0.875rem 2rem;
+    font-size: 1rem;
+    font-weight: 600;
+    text-decoration: none;
+    border-radius: 4px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: center;
+    min-width: 140px;
+}
+
+.travelers-btn-primary {
+    background-color: var(--travelers-btn-primary);
+    color: var(--travelers-white);
+}
+
+.travelers-btn-primary:hover {
+    background-color: var(--travelers-btn-hover);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(224, 23, 25, 0.3);
+}
+
+.travelers-btn-secondary {
+    background-color: transparent;
+    color: var(--travelers-white);
+    border: 2px solid var(--travelers-white);
+}
+
+.travelers-btn-secondary:hover {
+    background-color: var(--travelers-white);
+    color: var(--travelers-dark-blue);
+}
+
+.travelers-btn-large {
+    padding: 1.125rem 2.5rem;
+    font-size: 1.125rem;
+}
+
+/* Cards - Travelers Style */
+.travelers-card {
+    background-color: var(--travelers-white);
+    border-radius: 8px;
+    padding: 2rem;
+    box-shadow: 0 4px 12px rgba(0, 45, 75, 0.1);
+    border: 1px solid rgba(102, 134, 154, 0.2);
+    transition: all 0.3s ease;
+    margin-bottom: 2rem;
+}
+
+.travelers-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 45, 75, 0.15);
+}
+
+.travelers-card-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.travelers-card-icon {
+    font-size: 2.5rem;
+    margin-right: 1rem;
+    color: var(--travelers-btn-primary);
+}
+
+.travelers-card h3 {
+    color: var(--travelers-heading-color);
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+.travelers-card p {
+    color: var(--travelers-body-color);
+    line-height: 1.6;
+    margin-bottom: 1rem;
+}
+
+/* Grid Layout - Travelers Style */
+.travelers-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 2rem;
+}
+
+.travelers-grid {
+    display: grid;
+    gap: 2rem;
+    margin: 3rem 0;
+}
+
+.travelers-grid-2 {
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+}
+
+.travelers-grid-3 {
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+}
+
+/* Section Styling */
+.travelers-section {
+    padding: 4rem 0;
+}
+
+.travelers-section-alt {
+    background-color: var(--travelers-light-gray);
+}
+
+.travelers-section h2 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--travelers-heading-color);
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.travelers-section-subtitle {
+    font-size: 1.25rem;
+    color: var(--travelers-medium-gray);
+    text-align: center;
+    margin-bottom: 3rem;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Chat Widget - Travelers Style */
+.travelers-chat-widget {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 1000;
+}
+
+.travelers-chat-toggle {
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, var(--travelers-btn-primary) 0%, var(--travelers-btn-hover) 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 4px 20px rgba(224, 23, 25, 0.3);
+    transition: all 0.3s ease;
+    border: 3px solid var(--travelers-white);
+}
+
+.travelers-chat-toggle:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 25px rgba(224, 23, 25, 0.4);
+}
+
+.travelers-chat-toggle i {
+    color: var(--travelers-white);
+    font-size: 24px;
+}
+
+.travelers-chat-window {
+    position: absolute;
+    bottom: 70px;
+    right: 0;
+    width: 380px;
+    height: 500px;
+    background: var(--travelers-white);
+    border-radius: 12px;
+    box-shadow: 0 12px 40px rgba(0, 45, 75, 0.2);
+    border: 1px solid rgba(102, 134, 154, 0.2);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.travelers-chat-header {
+    background: linear-gradient(135deg, var(--travelers-dark-blue) 0%, var(--travelers-navy) 100%);
+    color: var(--travelers-white);
+    padding: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.travelers-chat-messages {
+    flex: 1;
+    padding: 1rem;
+    overflow-y: auto;
+    background: #fafbfc;
+}
+
+.travelers-message {
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: flex-start;
+}
+
+.travelers-message.user {
+    justify-content: flex-end;
+}
+
+.travelers-message-content {
+    max-width: 80%;
+    padding: 0.75rem 1rem;
+    border-radius: 12px;
+    font-size: 0.9rem;
+    line-height: 1.4;
+}
+
+.travelers-message.user .travelers-message-content {
+    background: var(--travelers-btn-primary);
+    color: var(--travelers-white);
+    border-bottom-right-radius: 4px;
+}
+
+.travelers-message.bot .travelers-message-content {
+    background: var(--travelers-white);
+    color: var(--travelers-body-color);
+    border: 1px solid rgba(102, 134, 154, 0.2);
+    border-bottom-left-radius: 4px;
+}
+
+/* Forms - Travelers Style */
+.travelers-form-group {
+    margin-bottom: 1.5rem;
+}
+
+.travelers-form-label {
+    display: block;
+    font-weight: 600;
+    color: var(--travelers-heading-color);
+    margin-bottom: 0.5rem;
+}
+
+.travelers-form-input {
+    width: 100%;
+    padding: 0.875rem 1rem;
+    border: 2px solid rgba(102, 134, 154, 0.3);
+    border-radius: 4px;
+    font-size: 1rem;
+    transition: border-color 0.3s ease;
+    background-color: var(--travelers-white);
+}
+
+.travelers-form-input:focus {
+    outline: none;
+    border-color: var(--travelers-light-blue);
+    box-shadow: 0 0 0 3px rgba(0, 115, 149, 0.1);
+}
+
+/* Upload Area - Travelers Style */
+.travelers-upload-area {
+    border: 2px dashed var(--travelers-medium-gray);
+    border-radius: 8px;
+    padding: 3rem 2rem;
+    text-align: center;
+    background-color: var(--travelers-light-gray);
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.travelers-upload-area:hover {
+    border-color: var(--travelers-light-blue);
+    background-color: rgba(0, 115, 149, 0.05);
+}
+
+.travelers-upload-icon {
+    font-size: 4rem;
+    color: var(--travelers-light-blue);
+    margin-bottom: 1rem;
+}
+
+/* Footer - Travelers Style */
+.travelers-footer {
+    background-color: var(--travelers-header-bg);
+    color: var(--travelers-white);
+    padding: 3rem 0 2rem;
+    margin-top: 4rem;
+}
+
+.travelers-footer-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 2rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+}
+
+.travelers-footer h4 {
+    color: var(--travelers-white);
+    font-size: 1.125rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+}
+
+.travelers-footer a {
+    color: rgba(255, 255, 255, 0.8);
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.travelers-footer a:hover {
+    color: var(--travelers-light-blue);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .travelers-nav {
+        flex-direction: column;
+        gap: 1rem;
+        padding: 1rem;
+    }
+    
+    .travelers-nav-links {
+        gap: 1rem;
+    }
+    
+    .travelers-hero h1 {
+        font-size: 2rem;
+    }
+    
+    .travelers-hero p {
+        font-size: 1rem;
+    }
+    
+    .travelers-container {
+        padding: 0 1rem;
+    }
+    
+    .travelers-chat-window {
+        width: 320px;
+        height: 400px;
+    }
+    
+    .travelers-grid {
+        gap: 1rem;
+    }
+    
+    /* Mobile: Stack side-by-side results vertically */
+    .results-grid {
+        grid-template-columns: 1fr !important;
+        gap: 1rem !important;
+    }
+}
+
+/* Results Grid for Side-by-Side Layout */
+.results-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+@media (max-width: 968px) {
+    .results-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+}
+
+/* Loading States */
+.travelers-loading {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: var(--travelers-white);
+    animation: travelers-spin 1s ease-in-out infinite;
+}
+
+@keyframes travelers-spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Utility Classes */
+.travelers-text-center { text-align: center; }
+.travelers-text-left { text-align: left; }
+.travelers-text-right { text-align: right; }
+
+.travelers-mb-1 { margin-bottom: 0.5rem; }
+.travelers-mb-2 { margin-bottom: 1rem; }
+.travelers-mb-3 { margin-bottom: 1.5rem; }
+.travelers-mb-4 { margin-bottom: 2rem; }
+
+.travelers-mt-1 { margin-top: 0.5rem; }
+.travelers-mt-2 { margin-top: 1rem; }
+.travelers-mt-3 { margin-top: 1.5rem; }
+.travelers-mt-4 { margin-top: 2rem; }
+
+.travelers-hidden { display: none; }
+.travelers-visible { display: block; }
+
+/* Enhanced Travelers.com Chat Styling */
+.travelers-chat-widget {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.travelers-chat-toggle {
+    background: linear-gradient(135deg, #e01719 0%, #c01315 100%);
+    box-shadow: 0 4px 20px rgba(224, 23, 25, 0.3);
+    transition: all 0.3s ease;
+}
+
+.travelers-chat-toggle:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 25px rgba(224, 23, 25, 0.4);
+}
+
+.travelers-chat-window {
+    width: 380px;
+    height: 500px;
+    border: 2px solid #007395;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+}
+
+.travelers-chat-header {
+    background: linear-gradient(135deg, #002d4b 0%, #007395 100%);
+    padding: 15px;
+    font-weight: 600;
+}
+
+.chat-title {
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.language-indicator {
+    background: rgba(255, 255, 255, 0.2);
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: bold;
+}
+
+.travelers-chat-messages {
+    padding: 15px;
+    background: #f8f9fa;
+}
+
+.travelers-message {
+    margin-bottom: 15px;
+    gap: 10px;
+}
+
+.message-avatar {
+    width: 32px;
+    height: 32px;
+    font-size: 16px;
+}
+
+.travelers-message.user .message-avatar {
+    background: #007395;
+}
+
+.travelers-message.bot .message-avatar {
+    background: #e01719;
+}
+
+.travelers-message-content {
+    max-width: 75%;
+    padding: 12px 16px;
+    border-radius: 18px;
+    font-size: 14px;
+    line-height: 1.4;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.travelers-message.user .travelers-message-content {
+    background: #007395;
+    border-bottom-right-radius: 4px;
+}
+
+.travelers-message.bot .travelers-message-content {
+    background: white;
+    color: #002d4b;
+    border: 1px solid #e0e6ed;
+    border-bottom-left-radius: 4px;
+}
+
+.travelers-chat-input {
+    padding: 15px;
+    border-top: 1px solid #e0e6ed;
+}
+
+.travelers-chat-input input {
+    padding: 12px 16px;
+    border: 2px solid #e0e6ed;
+    border-radius: 25px;
+    font-size: 14px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.travelers-chat-input input:focus {
+    border-color: #007395;
+}
+
+.travelers-chat-input button {
+    width: 44px;
+    height: 44px;
+    background: linear-gradient(135deg, #e01719 0%, #c01315 100%);
+    transition: all 0.2s;
+}
+
+.travelers-chat-input button:hover {
+    transform: scale(1.05);
+}

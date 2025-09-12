@@ -10,7 +10,7 @@
         <p>Get instant quotes, file claims, and manage your policies with our AI-powered multilingual platform. Serving customers worldwide in their preferred language.</p>
         <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; margin-top: 2rem;">
             <a href="#upload-section" class="travelers-btn travelers-btn-primary travelers-btn-large">Get Quote Now</a>
-            <a href="#" onclick="toggleChat()" class="travelers-btn travelers-btn-secondary travelers-btn-large">AI Assistant</a>
+            <a href="{{ url_for('chatbot_page') }}" class="travelers-btn travelers-btn-secondary travelers-btn-large">AI Assistant</a>
         </div>
     </div>
 </section>
@@ -59,7 +59,7 @@
             <form id="uploadForm" enctype="multipart/form-data">
                 <div class="travelers-form-group">
                     <label class="travelers-form-label">Upload Policy Document</label>
-                    <div class="travelers-upload-area" id="uploadArea">
+                    <div class="travelers-upload-area" onclick="document.getElementById('fileInput').click()">
                         <div class="travelers-upload-icon">📄</div>
                         <h3 style="margin-bottom: 0.5rem; color: var(--travelers-heading-color);">Drop your file here or click to browse</h3>
                         <p style="color: var(--travelers-medium-gray); margin-bottom: 0;">Supports PDF, JPG, PNG, HEIC files up to 16MB</p>
@@ -143,11 +143,6 @@
                 <span>AI Assistant</span>
             </div>
             <div class="chat-controls">
-                <a href="/" style="color: white; text-decoration: none; margin-right: 8px; font-size: 0.8rem;">🏠 Home</a>
-                <select id="customerSelect" style="background: white; border: 1px solid #ccc; border-radius: 4px; padding: 4px; font-size: 0.8rem; margin-right: 8px;">
-                    <option value="67890">Sarah Johnson (Home)</option>
-                    <option value="12345">John Smith (Auto)</option>
-                </select>
                 <span class="language-indicator" id="languageIndicator">🇺🇸 EN</span>
                 <button class="chat-close" onclick="toggleChat()">×</button>
             </div>
@@ -157,26 +152,14 @@
             <div class="travelers-message bot">
                 <div class="message-avatar">🤖</div>
                 <div class="travelers-message-content">
-                    Hello! I'm your AI insurance assistant. I can help you with:
+                    Hello! I'm your multilingual insurance assistant. I can help you with:
                     <br><br>
-                    <strong>📋 Policy Information:</strong>
-                    <br>• "What does my liability coverage include?"
-                    <br>• "When is my bill due?"
-                    <br>• "What are my payment options?"
+                    • Bill payments and policy information
+                    <br>• Claim status and filing
+                    <br>• Coverage explanations
+                    <br>• Questions in multiple languages
                     <br><br>
-                    <strong>🔍 Coverage Scenarios:</strong>
-                    <br>• "Will I be covered if a tree falls on my house?"
-                    <br>• "Will I be covered if I hit a deer?"
-                    <br><br>
-                    <strong>💰 Premium Questions:</strong>
-                    <br>• "Why did my premium go up?"
-                    <br>• "What affects my rates?"
-                    <br><br>
-                    <strong>📚 Policy Terms:</strong>
-                    <br>• "What is a deductible?"
-                    <br>• "How do I change my coverage?"
-                    <br><br>
-                    Try asking me anything about your insurance policy!
+                    Try asking: "What is my bill?" or "mera bill kitna hai" (Hindi)
                 </div>
             </div>
         </div>
@@ -194,9 +177,8 @@
 {% endblock %}
 
 {% block extra_js %}
-<script src="{{ url_for('static', filename='js/upload-fix.js') }}"></script>
 <script>
-// Chat Widget Functionality only
+// Chat Widget Functionality
 let chatOpen = false;
 
 function toggleChat() {
@@ -222,9 +204,11 @@ async function sendMessage() {
     
     if (!message) return;
     
+    // Add user message to chat
     addMessageToChat('user', message);
     input.value = '';
     
+    // Disable send button
     const sendButton = document.getElementById('sendButton');
     sendButton.disabled = true;
     sendButton.innerHTML = '<div class="loading-spinner"></div>';
@@ -232,39 +216,37 @@ async function sendMessage() {
     try {
         const response = await fetch('/api/chat', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+                'Content-Type': 'application/json',
+            },
             body: JSON.stringify({
                 message: message,
-                customer_id: document.getElementById('customerSelect').value || '12345'
+                customer_id: 'web_user_' + Date.now()
             })
         });
         
         const data = await response.json();
         
         if (data.success) {
+            // Update language indicator
             updateLanguageIndicator(data.detected_language);
             
-            // Add bot response with metadata
-            const metadata = {
-                supporting_document: data.supporting_document,
-                connect_to_agent: data.connect_to_agent,
-                intent: data.intent,
-                translation_method: data.translation_method
-            };
-            
-            addMessageToChat('bot', data.response, metadata);
+            // Add bot response
+            addMessageToChat('bot', data.response);
         } else {
             addMessageToChat('bot', 'Sorry, I encountered an error. Please try again.');
         }
     } catch (error) {
+        console.error('Chat error:', error);
         addMessageToChat('bot', 'Sorry, I\'m having trouble connecting. Please try again.');
     } finally {
+        // Re-enable send button
         sendButton.disabled = false;
         sendButton.innerHTML = '<i class="fas fa-paper-plane"></i>';
     }
 }
 
-function addMessageToChat(sender, message, metadata = {}) {
+function addMessageToChat(sender, message) {
     const messagesContainer = document.getElementById('chatMessages');
     const messageDiv = document.createElement('div');
     messageDiv.className = `travelers-message ${sender}`;
@@ -277,39 +259,152 @@ function addMessageToChat(sender, message, metadata = {}) {
     content.className = 'travelers-message-content';
     content.innerHTML = message.replace(/\n/g, '<br>');
     
-    // Add supporting document if available
-    if (metadata.supporting_document) {
-        const docRef = document.createElement('div');
-        docRef.style.cssText = 'margin-top: 10px; padding: 8px; background: rgba(0,115,149,0.1); border-radius: 6px; font-size: 0.85em; color: #007395;';
-        docRef.innerHTML = `📄 <strong>Reference:</strong> ${metadata.supporting_document}`;
-        content.appendChild(docRef);
-    }
-    
-    // Add connect to agent button if needed
-    if (metadata.connect_to_agent) {
-        const agentBtn = document.createElement('button');
-        agentBtn.style.cssText = 'margin-top: 10px; padding: 8px 16px; background: #e01719; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 0.9em;';
-        agentBtn.textContent = '📞 Connect to Live Agent';
-        agentBtn.onclick = function() {
-            addMessageToChat('bot', '📞 Connecting you to a live agent... Please hold while we transfer your conversation.');
-        };
-        content.appendChild(agentBtn);
-    }
-    
     messageDiv.appendChild(avatar);
     messageDiv.appendChild(content);
     messagesContainer.appendChild(messageDiv);
     
+    // Scroll to bottom
     messagesContainer.scrollTop = messagesContainer.scrollHeight;
 }
 
 function updateLanguageIndicator(langCode) {
     const indicator = document.getElementById('languageIndicator');
     const flags = {
-        'en': '🇺🇸 EN', 'hi': '🇮🇳 HI', 'es': '🇪🇸 ES',
-        'fr': '🇫🇷 FR', 'zh': '🇨🇳 ZH', 'ar': '🇸🇦 AR', 'ja': '🇯🇵 JA'
+        'en': '🇺🇸 EN',
+        'hi': '🇮🇳 HI', 
+        'es': '🇪🇸 ES',
+        'fr': '🇫🇷 FR',
+        'zh': '🇨🇳 ZH',
+        'ar': '🇸🇦 AR',
+        'ja': '🇯🇵 JA'
     };
+    
     indicator.textContent = flags[langCode] || '🌍 ' + langCode.toUpperCase();
 }
+
+// File Upload Functionality
+document.getElementById('uploadForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const fileInput = document.getElementById('fileInput');
+    const file = fileInput.files[0];
+    
+    if (!file) {
+        alert('Please select a file to upload.');
+        return;
+    }
+    
+    // Show loading state
+    document.getElementById('loadingState').classList.remove('travelers-hidden');
+    document.getElementById('results').classList.add('travelers-hidden');
+    
+    const formData = new FormData();
+    formData.append('file', file);
+    
+    try {
+        const response = await fetch('/upload', {
+            method: 'POST',
+            body: formData
+        });
+        
+        const data = await response.json();
+        
+        // Hide loading state
+        document.getElementById('loadingState').classList.add('travelers-hidden');
+        
+        if (data.success) {
+            displayResults(data);
+        } else {
+            displayError(data.error || 'Upload failed');
+        }
+    } catch (error) {
+        console.error('Upload error:', error);
+        document.getElementById('loadingState').classList.add('travelers-hidden');
+        displayError('Upload failed. Please try again.');
+    }
+});
+
+function displayResults(data) {
+    const resultsDiv = document.getElementById('results');
+    const analysis = data.analysis;
+    const quote = data.quote;
+    
+    let html = `
+        <div class="travelers-card" style="background: linear-gradient(135deg, #002d4b 0%, #131517 100%); color: white;">
+            <h3 style="color: white; margin-bottom: 1rem;">📊 Policy Analysis Results</h3>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                <div>
+                    <strong>Policy Type:</strong><br>
+                    <span style="color: #007395;">${analysis.policy_type}</span>
+                </div>
+                <div>
+                    <strong>Current Premium:</strong><br>
+                    <span style="color: #007395;">$${analysis.current_premium}</span>
+                </div>
+                <div>
+                    <strong>Carrier:</strong><br>
+                    <span style="color: #007395;">${analysis.carrier || 'Not detected'}</span>
+                </div>
+                <div>
+                    <strong>Confidence:</strong><br>
+                    <span style="color: #007395;">${Math.round(analysis.confidence * 100)}%</span>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    if (quote) {
+        html += `
+            <div class="travelers-card" style="background: linear-gradient(135deg, #e01719 0%, #c01315 100%); color: white; margin-top: 1rem;">
+                <h3 style="color: white; margin-bottom: 1rem;">💰 Your Competitive Quote</h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                    <div>
+                        <strong>Our Quote:</strong><br>
+                        <span style="font-size: 1.5rem; color: white;">$${quote.new_quote}</span>
+                    </div>
+                    <div>
+                        <strong>Your Savings:</strong><br>
+                        <span style="font-size: 1.5rem; color: white;">$${quote.savings}</span>
+                    </div>
+                    <div>
+                        <strong>Savings Percentage:</strong><br>
+                        <span style="font-size: 1.5rem; color: white;">${quote.savings_percent}%</span>
+                    </div>
+                </div>
+                <div style="margin-top: 1.5rem;">
+                    <a href="#" class="travelers-btn" style="background: white; color: #e01719; border: none;">Get Full Quote</a>
+                </div>
+            </div>
+        `;
+    }
+    
+    resultsDiv.innerHTML = html;
+    resultsDiv.classList.remove('travelers-hidden');
+}
+
+function displayError(error) {
+    const resultsDiv = document.getElementById('results');
+    resultsDiv.innerHTML = `
+        <div class="travelers-card" style="border-left: 4px solid #e01719;">
+            <h3 style="color: #e01719;">❌ Upload Error</h3>
+            <p>${error}</p>
+            <p>Please try again with a different file or contact support if the problem persists.</p>
+        </div>
+    `;
+    resultsDiv.classList.remove('travelers-hidden');
+}
+
+// File input styling
+document.getElementById('fileInput').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (file) {
+        const uploadArea = document.querySelector('.travelers-upload-area');
+        uploadArea.innerHTML = `
+            <div class="travelers-upload-icon">✅</div>
+            <h3 style="margin-bottom: 0.5rem; color: var(--travelers-heading-color);">File Selected: ${file.name}</h3>
+            <p style="color: var(--travelers-medium-gray); margin-bottom: 0;">Click "Analyze Document" to continue</p>
+        `;
+    }
+});
 </script>
 {% endblock %}

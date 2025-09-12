@@ -1,3 +1,6 @@
+# Environment variables
+.env
+
 # Python
 __pycache__/
 *.py[cod]
@@ -19,54 +22,21 @@ wheels/
 *.egg-info/
 .installed.cfg
 *.egg
-MANIFEST
 
-# Virtual Environment
-venv/
-env/
-ENV/
-env.bak/
-venv.bak/
+# Flask
+instance/
+.webassets-cache
+
+# Uploads
+uploads/
+*.log
 
 # IDE
 .vscode/
 .idea/
 *.swp
 *.swo
-*~
 
 # OS
 .DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
 Thumbs.db
-
-# Application specific
-uploads/*
-!uploads/.gitkeep
-*.log
-server.log
-temp/
-cache/
-
-# Sensitive files
-config.py
-.env
-*.key
-*.pem
-
-# Test files
-test_*.py
-demo_*.py
-sample-*.pdf
-sample-*.jpg
-sample-*.png
-
-# Temporary files
-*.tmp
-*.temp
-*.bak
-*.backup

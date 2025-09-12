@@ -1,0 +1,246 @@
+{
+  "coverage_explanations": {
+    "liability": {
+      "description": "Covers damages you cause to others in an accident",
+      "what_it_covers": [
+        "Bodily injury to other people",
+        "Property damage to other vehicles/property", 
+        "Legal defense costs if you're sued"
+      ],
+      "what_it_doesnt_cover": [
+        "Your own injuries or vehicle damage",
+        "Intentional acts",
+        "Business use of vehicle"
+      ],
+      "required": true,
+      "document_reference": "Policy Section 2: Liability Coverage"
+    },
+    "collision": {
+      "description": "Covers damage to your vehicle from collisions",
+      "what_it_covers": [
+        "Damage from hitting another vehicle",
+        "Damage from hitting objects (trees, poles, etc.)",
+        "Vehicle rollover damage"
+      ],
+      "what_it_doesnt_cover": [
+        "Mechanical breakdown",
+        "Wear and tear",
+        "Damage from weather/theft (that's comprehensive)"
+      ],
+      "required": false,
+      "document_reference": "Policy Section 3: Physical Damage Coverage"
+    },
+    "comprehensive": {
+      "description": "Covers damage to your vehicle from non-collision events",
+      "what_it_covers": [
+        "Theft or vandalism",
+        "Weather damage (hail, flood, wind)",
+        "Fire damage",
+        "Animal collisions",
+        "Falling objects"
+      ],
+      "what_it_doesnt_cover": [
+        "Collision damage",
+        "Mechanical problems",
+        "Personal belongings in car"
+      ],
+      "required": false,
+      "document_reference": "Policy Section 3: Physical Damage Coverage"
+    },
+    "uninsured_motorist": {
+      "description": "Protects you when hit by uninsured/underinsured drivers",
+      "what_it_covers": [
+        "Your medical expenses",
+        "Lost wages",
+        "Pain and suffering",
+        "Vehicle damage (in some states)"
+      ],
+      "what_it_doesnt_cover": [
+        "Damage you cause to others",
+        "Your vehicle damage (unless UMPD included)"
+      ],
+      "required": "varies_by_state",
+      "document_reference": "Policy Section 4: Uninsured Motorist Coverage"
+    },
+    "dwelling": {
+      "description": "Covers the structure of your home",
+      "what_it_covers": [
+        "House structure and attached structures",
+        "Built-in appliances and fixtures",
+        "Materials and supplies for repairs"
+      ],
+      "what_it_doesnt_cover": [
+        "Land value",
+        "Detached structures (separate coverage)",
+        "Personal belongings"
+      ],
+      "required": "if_mortgage",
+      "document_reference": "Policy Section 1: Property Coverage"
+    },
+    "personal_property": {
+      "description": "Covers your belongings inside and outside the home",
+      "what_it_covers": [
+        "Furniture and electronics",
+        "Clothing and personal items",
+        "Items temporarily away from home"
+      ],
+      "what_it_doesnt_cover": [
+        "Business property",
+        "Vehicles",
+        "High-value items without scheduling"
+      ],
+      "required": false,
+      "document_reference": "Policy Section 1: Property Coverage"
+    }
+  },
+  "policy_terms": {
+    "deductible": {
+      "definition": "Amount you pay out-of-pocket before insurance coverage begins",
+      "how_it_works": "Higher deductible = Lower premium. You choose this amount when buying coverage.",
+      "example": "With $500 deductible and $3000 claim, you pay $500, insurance pays $2500",
+      "document_reference": "Policy Definitions Section"
+    },
+    "premium": {
+      "definition": "The amount you pay for insurance coverage",
+      "how_it_works": "Based on risk factors, coverage amounts, and deductible choices",
+      "payment_options": ["Monthly", "Quarterly", "Semi-annual", "Annual"],
+      "document_reference": "Policy Declarations Page"
+    },
+    "policy_period": {
+      "definition": "Time period your insurance coverage is active",
+      "typical_length": "6 months or 1 year",
+      "renewal_process": "Automatic renewal unless cancelled by you or insurer",
+      "document_reference": "Policy Declarations Page"
+    },
+    "exclusions": {
+      "definition": "Specific situations or damages not covered by your policy",
+      "common_examples": [
+        "Intentional damage",
+        "Normal wear and tear", 
+        "Business use (personal policies)",
+        "Racing or illegal activities"
+      ],
+      "document_reference": "Policy Section: Exclusions"
+    }
+  },
+  "coverage_scenarios": {
+    "auto_scenarios": [
+      {
+        "scenario": "I hit a deer while driving",
+        "covered_by": "comprehensive",
+        "explanation": "Animal collisions are covered under comprehensive coverage, not collision",
+        "what_you_pay": "Your comprehensive deductible",
+        "document_reference": "Policy Section 3: Comprehensive Coverage"
+      },
+      {
+        "scenario": "Someone rear-ends me and they don't have insurance",
+        "covered_by": "uninsured_motorist",
+        "explanation": "Your uninsured motorist coverage pays for your injuries and potentially vehicle damage",
+        "what_you_pay": "Your UM deductible (if any)",
+        "document_reference": "Policy Section 4: Uninsured Motorist Coverage"
+      },
+      {
+        "scenario": "I accidentally hit another car",
+        "covered_by": "liability",
+        "explanation": "Your liability coverage pays for the other person's damages and injuries",
+        "what_you_pay": "No deductible for liability coverage",
+        "document_reference": "Policy Section 2: Liability Coverage"
+      },
+      {
+        "scenario": "My car is stolen",
+        "covered_by": "comprehensive",
+        "explanation": "Theft is covered under comprehensive coverage",
+        "what_you_pay": "Your comprehensive deductible",
+        "document_reference": "Policy Section 3: Comprehensive Coverage"
+      },
+      {
+        "scenario": "Hail damages my car",
+        "covered_by": "comprehensive", 
+        "explanation": "Weather-related damage is covered under comprehensive coverage",
+        "what_you_pay": "Your comprehensive deductible",
+        "document_reference": "Policy Section 3: Comprehensive Coverage"
+      }
+    ],
+    "home_scenarios": [
+      {
+        "scenario": "A tree falls on my house during a storm",
+        "covered_by": "dwelling",
+        "explanation": "Storm damage to your home structure is covered under dwelling coverage",
+        "what_you_pay": "Your policy deductible",
+        "document_reference": "Policy Section 1: Dwelling Coverage"
+      },
+      {
+        "scenario": "Someone is injured on my property",
+        "covered_by": "liability",
+        "explanation": "Personal liability coverage pays for injuries to others on your property",
+        "what_you_pay": "No deductible for liability coverage",
+        "document_reference": "Policy Section 2: Personal Liability"
+      },
+      {
+        "scenario": "My laptop is stolen from my car",
+        "covered_by": "personal_property",
+        "explanation": "Personal belongings are covered even when away from home",
+        "what_you_pay": "Your policy deductible",
+        "document_reference": "Policy Section 1: Personal Property Coverage"
+      },
+      {
+        "scenario": "Water damage from burst pipe",
+        "covered_by": "dwelling_and_personal_property",
+        "explanation": "Sudden water damage is typically covered, but gradual leaks may not be",
+        "what_you_pay": "Your policy deductible",
+        "document_reference": "Policy Section 1: Property Coverage"
+      }
+    ]
+  },
+  "premium_factors": {
+    "auto_factors": [
+      {
+        "factor": "Driving record",
+        "impact": "Accidents and violations increase premium",
+        "explanation": "Insurance companies use 3-5 year history to assess risk"
+      },
+      {
+        "factor": "Vehicle type",
+        "impact": "Expensive or high-performance cars cost more to insure",
+        "explanation": "Based on repair costs, theft rates, and safety ratings"
+      },
+      {
+        "factor": "Location",
+        "impact": "Urban areas typically have higher rates",
+        "explanation": "Higher accident rates and theft in densely populated areas"
+      },
+      {
+        "factor": "Coverage amounts",
+        "impact": "Higher limits increase premium",
+        "explanation": "More coverage = higher potential payouts = higher premium"
+      },
+      {
+        "factor": "Deductible",
+        "impact": "Higher deductible decreases premium",
+        "explanation": "You take on more financial responsibility"
+      }
+    ],
+    "home_factors": [
+      {
+        "factor": "Home value",
+        "impact": "More expensive homes cost more to insure",
+        "explanation": "Higher replacement costs require higher coverage limits"
+      },
+      {
+        "factor": "Location risks",
+        "impact": "Areas prone to natural disasters cost more",
+        "explanation": "Flood zones, earthquake areas, hurricane regions have higher rates"
+      },
+      {
+        "factor": "Home age and condition",
+        "impact": "Older homes may cost more due to higher risk",
+        "explanation": "Older electrical, plumbing, and roofing increase claim likelihood"
+      },
+      {
+        "factor": "Security features",
+        "impact": "Security systems and smoke detectors reduce premium",
+        "explanation": "Risk reduction measures lower claim probability"
+      }
+    ]
+  }
+}

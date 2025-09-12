@@ -1,0 +1,161 @@
+{
+  "customer_12345": {
+    "personal_info": {
+      "name": "John Smith",
+      "policy_number": "AUTO-789456123",
+      "customer_id": "12345",
+      "phone": "(555) 123-4567",
+      "email": "john.smith@email.com"
+    },
+    "policy_details": {
+      "policy_type": "Auto Insurance",
+      "carrier": "InsureQuote Pro",
+      "policy_start": "2024-01-15",
+      "policy_end": "2025-01-15",
+      "premium_amount": 1248.00,
+      "payment_frequency": "monthly",
+      "monthly_payment": 104.00,
+      "next_due_date": "2024-08-15",
+      "payment_methods": ["Auto-pay from checking", "Credit card", "Online banking"],
+      "deductible": 500
+    },
+    "coverage_details": {
+      "liability": {
+        "bodily_injury": "$100,000 per person / $300,000 per accident",
+        "property_damage": "$50,000 per accident",
+        "premium_portion": 312.00
+      },
+      "collision": {
+        "coverage_limit": "$25,000",
+        "deductible": "$500",
+        "premium_portion": 374.40
+      },
+      "comprehensive": {
+        "coverage_limit": "$25,000", 
+        "deductible": "$500",
+        "premium_portion": 249.60
+      },
+      "uninsured_motorist": {
+        "bodily_injury": "$100,000 per person / $300,000 per accident",
+        "property_damage": "$50,000 per accident",
+        "premium_portion": 187.20
+      },
+      "personal_injury_protection": {
+        "coverage_limit": "$10,000",
+        "premium_portion": 124.80
+      }
+    },
+    "vehicle_info": {
+      "year": 2020,
+      "make": "Honda",
+      "model": "Civic",
+      "vin": "1HGBH41JXMN109186",
+      "usage": "Commuting and personal use"
+    },
+    "claims_history": [
+      {
+        "claim_id": "CLM-2024-001",
+        "date": "2024-03-15",
+        "type": "Collision",
+        "status": "Closed - Paid",
+        "amount_paid": 2850.00,
+        "description": "Rear-end collision at intersection"
+      }
+    ],
+    "premium_history": [
+      {
+        "period": "2024-2025",
+        "amount": 1248.00,
+        "change_reason": "Claim surcharge applied (+$150)"
+      },
+      {
+        "period": "2023-2024", 
+        "amount": 1098.00,
+        "change_reason": "Base renewal"
+      }
+    ],
+    "discounts": [
+      {
+        "name": "Safe Driver",
+        "amount": 124.80,
+        "description": "No accidents in 3+ years (before recent claim)"
+      },
+      {
+        "name": "Multi-Policy",
+        "amount": 62.40,
+        "description": "Bundle with home insurance"
+      }
+    ]
+  },
+  "customer_67890": {
+    "personal_info": {
+      "name": "Sarah Johnson",
+      "policy_number": "HOME-456789012",
+      "customer_id": "67890",
+      "phone": "(555) 987-6543",
+      "email": "sarah.johnson@email.com"
+    },
+    "policy_details": {
+      "policy_type": "Home Insurance",
+      "carrier": "InsureQuote Pro",
+      "policy_start": "2024-06-01",
+      "policy_end": "2025-06-01",
+      "premium_amount": 1680.00,
+      "payment_frequency": "annual",
+      "monthly_payment": 140.00,
+      "next_due_date": "2025-06-01",
+      "payment_methods": ["Annual check payment", "Credit card", "Bank transfer"],
+      "deductible": 1000
+    },
+    "coverage_details": {
+      "dwelling": {
+        "coverage_limit": "$350,000",
+        "premium_portion": 840.00
+      },
+      "personal_property": {
+        "coverage_limit": "$175,000",
+        "premium_portion": 420.00
+      },
+      "liability": {
+        "coverage_limit": "$300,000",
+        "premium_portion": 252.00
+      },
+      "medical_payments": {
+        "coverage_limit": "$5,000",
+        "premium_portion": 84.00
+      },
+      "loss_of_use": {
+        "coverage_limit": "$70,000",
+        "premium_portion": 84.00
+      }
+    },
+    "property_info": {
+      "address": "123 Oak Street, Springfield, IL 62701",
+      "year_built": 1995,
+      "square_footage": 2400,
+      "construction_type": "Frame",
+      "roof_type": "Asphalt shingle",
+      "heating_type": "Gas furnace"
+    },
+    "claims_history": [],
+    "premium_history": [
+      {
+        "period": "2024-2025",
+        "amount": 1680.00,
+        "change_reason": "New policy"
+      }
+    ],
+    "discounts": [
+      {
+        "name": "Home Security",
+        "amount": 168.00,
+        "description": "Monitored security system"
+      },
+      {
+        "name": "Claims-Free",
+        "amount": 84.00,
+        "description": "No claims in past 5 years"
+      }
+    ]
+  }
+}
