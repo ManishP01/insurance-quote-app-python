@@ -88,30 +88,25 @@ class VisionDocumentProcessor:
             )
             
             # Parse response
-            content = response.choices[0].message.content
-            print(f"🔍 Vision API raw response: {content}")
+            content = response.choices[0].message.content.strip()
+            
+            # Remove markdown code blocks if present
+            if content.startswith('```json'):
+                content = content[7:]  # Remove ```json
+            if content.startswith('```'):
+                content = content[3:]   # Remove ```
+            if content.endswith('```'):
+                content = content[:-3]  # Remove closing ```
+            
+            content = content.strip()
             
             try:
                 result = json.loads(content)
             except json.JSONDecodeError as e:
-                print(f"❌ JSON parsing failed: {e}")
-                # Try to extract JSON from the response if it's wrapped in text
-                import re
-                json_match = re.search(r'\{.*\}', content, re.DOTALL)
-                if json_match:
-                    try:
-                        result = json.loads(json_match.group())
-                        print("✅ Extracted JSON from wrapped response")
-                    except json.JSONDecodeError:
-                        return {
-                            'success': False,
-                            'error': f'Could not parse Vision API response as JSON: {e}'
-                        }
-                else:
-                    return {
-                        'success': False,
-                        'error': f'No JSON found in Vision API response: {content}'
-                    }
+                return {
+                    'success': False,
+                    'error': f'Could not parse Vision API response: {e}'
+                }
             
             return {
                 'success': True,
