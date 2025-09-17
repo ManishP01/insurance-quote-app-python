@@ -111,7 +111,12 @@ Intent definitions:
         elif intent == 'coverage_question':
             result = self.handle_coverage_explanation(customer, {'coverage_type': 'general'})
         elif intent == 'coverage_scenario':
-            result = self.handle_coverage_scenario(customer, {'scenario': params.get('english_message', message)})
+            # Pass both original message and English translation for better keyword matching
+            scenario_params = {
+                'scenario': params.get('english_message', message),
+                'original_message': message
+            }
+            result = self.handle_coverage_scenario(customer, scenario_params)
         elif intent == 'policy_renewal':
             result = self.handle_policy_renewal(customer, params)
         elif intent == 'bill_question':

@@ -218,10 +218,14 @@ class AIInsuranceBot:
     def handle_coverage_scenario(self, customer: Dict, params: Dict) -> Dict:
         """Handle scenario-based coverage questions with decisive answers"""
         scenario = params['scenario'].lower()
+        original_message = params.get('original_message', '').lower()
         customer_name = customer['personal_info']['name']
         
+        # Check both English translation and original message for keywords
+        combined_text = f"{scenario} {original_message}"
+        
         # Theft/Burglary scenario (English and Hindi)
-        if any(keyword in scenario for keyword in ['theft', 'stolen', 'burglary', 'break in', 'chori', 'chori hui']):
+        if any(keyword in combined_text for keyword in ['theft', 'stolen', 'burglary', 'break in', 'chori', 'chori hui']):
             if customer['policy_details']['policy_type'] == 'Home Insurance':
                 if 'personal_property' in customer['coverage_details']:
                     property_coverage = customer['coverage_details']['personal_property']
@@ -282,7 +286,7 @@ class AIInsuranceBot:
                 }
         
         # Tree falls on house scenario (English and Hindi)
-        if any(keyword in scenario for keyword in ['tree falls', 'tree fall', 'tree on house', 'tree damage', 'ped gira', 'ped girna']):
+        if any(keyword in combined_text for keyword in ['tree falls', 'tree fall', 'tree on house', 'tree damage', 'ped gira', 'ped girna']):
             if customer['policy_details']['policy_type'] == 'Home Insurance':
                 dwelling_coverage = customer['coverage_details']['dwelling']
                 response = f"**✅ YES, {customer_name}, you ARE covered!**\n\n"
