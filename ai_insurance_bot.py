@@ -220,8 +220,69 @@ class AIInsuranceBot:
         scenario = params['scenario'].lower()
         customer_name = customer['personal_info']['name']
         
-        # Tree falls on house scenario
-        if any(keyword in scenario for keyword in ['tree falls', 'tree fall', 'tree on house', 'tree damage']):
+        # Theft/Burglary scenario (English and Hindi)
+        if any(keyword in scenario for keyword in ['theft', 'stolen', 'burglary', 'break in', 'chori', 'chori hui']):
+            if customer['policy_details']['policy_type'] == 'Home Insurance':
+                if 'personal_property' in customer['coverage_details']:
+                    property_coverage = customer['coverage_details']['personal_property']
+                    response = f"**✅ YES, {customer_name}, you ARE covered!**\n\n"
+                    response += f"🏠 **Personal Property Coverage**: {property_coverage['coverage_limit']}\n"
+                    response += f"💰 **Your Deductible**: ${customer['policy_details']['deductible']}\n\n"
+                    response += f"**What's covered:**\n"
+                    response += f"• Stolen personal belongings (furniture, electronics, clothing)\n"
+                    response += f"• Damage from forced entry\n"
+                    response += f"• Temporary living expenses if home is uninhabitable\n\n"
+                    response += f"**Next steps if this happens:**\n"
+                    response += f"1. Call police immediately\n"
+                    response += f"2. File police report\n"
+                    response += f"3. Call claims: (555) CLAIMS-1\n"
+                    response += f"4. Document stolen items with receipts/photos\n"
+                    
+                    return {
+                        'response': response,
+                        'intent': 'coverage_scenario',
+                        'supporting_document': 'Policy Section 2: Personal Property Coverage',
+                        'connect_to_agent': False
+                    }
+                else:
+                    response = f"**❌ NO, {customer_name}, theft is NOT covered.**\n\n"
+                    response += f"🏠 Your Home Insurance doesn't include Personal Property Coverage\n"
+                    response += f"💡 **To be covered**: Add Personal Property Coverage to your policy"
+                    
+                    return {
+                        'response': response,
+                        'intent': 'coverage_scenario',
+                        'supporting_document': None,
+                        'connect_to_agent': True
+                    }
+            elif customer['policy_details']['policy_type'] == 'Auto Insurance':
+                if 'comprehensive' in customer['coverage_details']:
+                    comp_coverage = customer['coverage_details']['comprehensive']
+                    response = f"**✅ YES, {customer_name}, you ARE covered!**\n\n"
+                    response += f"🚗 **Vehicle theft is covered by Comprehensive Coverage**\n"
+                    response += f"🚗 **Your Coverage**: {comp_coverage['coverage_limit']}\n"
+                    response += f"💰 **Your Deductible**: {comp_coverage['deductible']}\n\n"
+                    response += f"**What you pay**: {comp_coverage['deductible']} deductible\n"
+                    response += f"**Insurance pays**: Vehicle value minus deductible\n\n"
+                    response += f"**Next steps if this happens:**\n"
+                    response += f"1. Call police immediately\n"
+                    response += f"2. File police report\n"
+                    response += f"3. Call claims: (555) CLAIMS-1\n"
+                else:
+                    response = f"**❌ NO, {customer_name}, vehicle theft is NOT covered.**\n\n"
+                    response += f"🚗 Vehicle theft requires Comprehensive Coverage\n"
+                    response += f"📋 **You currently have**: {', '.join(customer['coverage_details'].keys())}\n"
+                    response += f"💡 **To be covered**: Add Comprehensive Coverage to your policy"
+                
+                return {
+                    'response': response,
+                    'intent': 'coverage_scenario',
+                    'supporting_document': 'Policy Section 3: Comprehensive Coverage',
+                    'connect_to_agent': False
+                }
+        
+        # Tree falls on house scenario (English and Hindi)
+        if any(keyword in scenario for keyword in ['tree falls', 'tree fall', 'tree on house', 'tree damage', 'ped gira', 'ped girna']):
             if customer['policy_details']['policy_type'] == 'Home Insurance':
                 dwelling_coverage = customer['coverage_details']['dwelling']
                 response = f"**✅ YES, {customer_name}, you ARE covered!**\n\n"
