@@ -197,10 +197,16 @@ def calculate_quote_from_vision_data(vision_data: dict) -> dict:
     policy_type = vision_data.get('policy_type', 'Unknown')
     current_premium_str = vision_data.get('premium_amount', '$0')
     
+    print(f"🔍 Quote calculation - Policy: {policy_type}, Premium string: {current_premium_str}")
+    
     # Extract numeric value from current premium
     import re
-    current_premium_match = re.search(r'[\d,]+', current_premium_str.replace('$', '').replace(',', ''))
-    current_premium = int(current_premium_match.group()) if current_premium_match else 2000
+    # Remove $ and commas, then extract numbers
+    clean_premium = current_premium_str.replace('$', '').replace(',', '')
+    current_premium_match = re.search(r'(\d+(?:\.\d+)?)', clean_premium)
+    current_premium = float(current_premium_match.group(1)) if current_premium_match else 2000
+    
+    print(f"💰 Extracted current premium: ${current_premium}")
     
     # Generate competitive quote based on policy type
     if 'Auto' in policy_type:
@@ -220,6 +226,8 @@ def calculate_quote_from_vision_data(vision_data: dict) -> dict:
     savings = max(0, current_premium - base_quote)
     savings_percent = round((savings / current_premium) * 100, 1) if current_premium > 0 else 0
     
+    print(f"📊 Quote: ${base_quote}, Savings: ${savings}, Percent: {savings_percent}%")
+    
     return {
         'annual_premium': base_quote,
         'monthly_premium': round(base_quote / 12, 2),
@@ -232,6 +240,7 @@ def calculate_quote_from_vision_data(vision_data: dict) -> dict:
         'new_quote': base_quote,
         'savings': savings,
         'savings_percent': savings_percent,
+        'current_premium': current_premium,  # Add this for frontend display
         'confidence': vision_data.get('confidence', 0.8),
         'coverage_summary': coverage_types,
         'processing_method': 'openai_vision'
@@ -332,6 +341,7 @@ def index():
 
 @app.route('/upload', methods=['POST'])
 def upload_file():
+    print(f"📤 Upload request received - Files: {list(request.files.keys())}")
     try:
         if 'file' not in request.files:
             return jsonify({'success': False, 'error': 'No file provided'})
@@ -342,6 +352,8 @@ def upload_file():
         
         if not allowed_file(file.filename):
             return jsonify({'success': False, 'error': 'File type not allowed'})
+        
+        print(f"📄 Processing file: {file.filename}")
         
         # Save file temporarily
         filename = secure_filename(file.filename)
@@ -358,6 +370,11 @@ def upload_file():
                 if vision_result['success']:
                     extracted_data = vision_result['extracted_data']
                     quote = calculate_quote_from_vision_data(extracted_data)
+                    
+                    # Add current premium to analysis for frontend display
+                    extracted_data['current_premium'] = quote['current_premium']
+                    
+                    print(f"✅ Vision processing complete - returning quote data")
                     
                     return jsonify({
                         'success': True,
