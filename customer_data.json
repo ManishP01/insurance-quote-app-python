@@ -9,7 +9,7 @@
     },
     "policy_details": {
       "policy_type": "Auto Insurance",
-      "carrier": "InsureQuote Pro",
+      "carrier": "PolicyPal",
       "policy_start": "2024-01-15",
       "policy_end": "2025-01-15",
       "premium_amount": 1248.00,
@@ -97,7 +97,7 @@
     },
     "policy_details": {
       "policy_type": "Home Insurance",
-      "carrier": "InsureQuote Pro",
+      "carrier": "PolicyPal",
       "policy_start": "2024-06-01",
       "policy_end": "2025-06-01",
       "premium_amount": 1680.00,
