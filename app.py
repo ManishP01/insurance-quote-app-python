@@ -208,17 +208,23 @@ def calculate_quote_from_vision_data(vision_data: dict) -> dict:
     
     print(f"💰 Extracted current premium: ${current_premium}")
     
-    # Generate competitive quote based on policy type
+    # Generate competitive quote based on policy type (always lower than current)
     if 'Auto' in policy_type:
-        base_quote = random.randint(800, 1500)
+        # Generate quote 10-30% lower than current premium
+        discount_percent = random.uniform(0.10, 0.30)
+        base_quote = int(current_premium * (1 - discount_percent))
         quote_type = "Auto Insurance"
         coverage_types = ['Liability', 'Collision', 'Comprehensive']
     elif 'Home' in policy_type:
-        base_quote = random.randint(1200, 2500)
+        # Generate quote 15-35% lower than current premium
+        discount_percent = random.uniform(0.15, 0.35)
+        base_quote = int(current_premium * (1 - discount_percent))
         quote_type = "Home Insurance"
         coverage_types = ['Dwelling', 'Personal Property', 'Liability']
     else:
-        base_quote = random.randint(1000, 2000)
+        # Generate quote 10-25% lower than current premium
+        discount_percent = random.uniform(0.10, 0.25)
+        base_quote = int(current_premium * (1 - discount_percent))
         quote_type = "Insurance"
         coverage_types = ['Basic Coverage']
     
