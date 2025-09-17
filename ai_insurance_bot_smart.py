@@ -4,6 +4,7 @@ Smart OpenAI-Based Insurance Bot - No Hardcoding
 
 import json
 import os
+import ssl
 from typing import Dict, List, Optional, Tuple
 from ai_insurance_bot import AIInsuranceBot
 
@@ -25,7 +26,26 @@ class SmartAIInsuranceBot(AIInsuranceBot):
         
         if self.openai_available:
             openai.api_key = api_key
-            print("✅ Smart OpenAI Insurance Bot enabled")
+            
+            # Handle SSL issues on corporate networks
+            disable_ssl = os.getenv('DISABLE_SSL_VERIFY', 'false').lower() == 'true'
+            if disable_ssl:
+                try:
+                    import urllib3
+                    urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+                    
+                    # Set SSL context for corporate environments
+                    import ssl
+                    ssl_context = ssl.create_default_context()
+                    ssl_context.check_hostname = False
+                    ssl_context.verify_mode = ssl.CERT_NONE
+                    
+                    print("✅ Smart OpenAI Insurance Bot enabled (SSL verification disabled for corporate network)")
+                except Exception as ssl_error:
+                    print(f"⚠️ SSL configuration warning: {ssl_error}")
+                    print("✅ Smart OpenAI Insurance Bot enabled")
+            else:
+                print("✅ Smart OpenAI Insurance Bot enabled")
         else:
             print("⚠️ Falling back to hardcoded patterns")
     

@@ -11,13 +11,16 @@ PyPDF2==3.0.1
 # Environment Variables
 python-dotenv==1.0.0
 
-# AI/OpenAI Integration
+# AI/OpenAI Integration (includes Vision API)
 openai==0.28.1
 
-# OCR Dependencies (for document analysis feature)
-pytesseract==0.3.10
-easyocr==1.7.0
-opencv-python==4.8.1.78
+# Image Processing (minimal - for Vision API)
 Pillow==10.0.1
-PyMuPDF==1.23.8
-numpy==1.24.3
+
+# OCR Dependencies (OPTIONAL - only if Vision API not available)
+# Uncomment these if you need OCR fallback:
+# pytesseract==0.3.10
+# easyocr==1.7.0
+# opencv-python==4.8.1.78
+# PyMuPDF==1.23.8
+# numpy==1.24.3

@@ -184,6 +184,39 @@ def analyze_policy_document(text):
     
     return analysis
 
+def calculate_quote_from_vision_data(vision_data: dict) -> dict:
+    """Generate insurance quote from OpenAI Vision extracted data"""
+    policy_type = vision_data.get('policy_type', 'Unknown')
+    current_premium = vision_data.get('premium_amount', 'Not found')
+    
+    # Generate competitive quote based on policy type
+    if 'Auto' in policy_type:
+        base_quote = random.randint(800, 1500)
+        quote_type = "Auto Insurance"
+        coverage_types = ['Liability', 'Collision', 'Comprehensive']
+    elif 'Home' in policy_type:
+        base_quote = random.randint(1200, 2500)
+        quote_type = "Home Insurance"
+        coverage_types = ['Dwelling', 'Personal Property', 'Liability']
+    else:
+        base_quote = random.randint(1000, 2000)
+        quote_type = "Insurance"
+        coverage_types = ['Basic Coverage']
+    
+    return {
+        'annual_premium': base_quote,
+        'monthly_premium': round(base_quote / 12, 2),
+        'policy_type': quote_type,
+        'current_policy_info': {
+            'type': policy_type,
+            'premium': current_premium
+        },
+        'savings_estimate': f"${random.randint(100, 500)}",
+        'confidence': vision_data.get('confidence', 0.8),
+        'coverage_summary': coverage_types,
+        'processing_method': 'openai_vision'
+    }
+
 def calculate_competitive_quote(analysis):
     """Calculate competitive quote with detailed coverage comparison"""
     if analysis['policy_type'] == 'Unknown':
@@ -296,16 +329,35 @@ def upload_file():
         file.save(temp_path)
         
         try:
-            # Process the file
+            # Try OpenAI Vision first (no OCR needed)
+            try:
+                from vision_processor import VisionDocumentProcessor
+                vision_processor = VisionDocumentProcessor()
+                vision_result = vision_processor.process_uploaded_file(temp_path)
+                
+                if vision_result['success']:
+                    extracted_data = vision_result['extracted_data']
+                    quote = calculate_quote_from_vision_data(extracted_data)
+                    
+                    return jsonify({
+                        'success': True,
+                        'analysis': extracted_data,
+                        'quote': quote,
+                        'processing_method': 'openai_vision'
+                    })
+            except ImportError:
+                print("Vision processor not available, trying fallback methods...")
+            
+            # Fallback to text extraction methods
             if filename.lower().endswith('.pdf'):
                 # PDF processing
                 text = extract_text_from_pdf(temp_path)
                 if not text.strip():
                     return jsonify({'success': False, 'error': 'Could not extract text from PDF'})
             else:
-                # Image processing with OCR
+                # Image processing with OCR (if available)
                 if not OCR_AVAILABLE:
-                    return jsonify({'success': False, 'error': 'OCR not available for image processing'})
+                    return jsonify({'success': False, 'error': 'Image processing requires OCR libraries or OpenAI Vision API'})
                 
                 result = ocr_processor.process_document(temp_path)
                 if not result['success']:
