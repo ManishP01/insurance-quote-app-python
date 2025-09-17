@@ -56,7 +56,7 @@ class VisionDocumentProcessor:
             
             # Analyze with OpenAI Vision
             response = openai.ChatCompletion.create(
-                model="gpt-4-vision-preview",
+                model="gpt-4o",
                 messages=[
                     {
                         "role": "user",
@@ -88,7 +88,30 @@ class VisionDocumentProcessor:
             )
             
             # Parse response
-            result = json.loads(response.choices[0].message.content)
+            content = response.choices[0].message.content
+            print(f"🔍 Vision API raw response: {content}")
+            
+            try:
+                result = json.loads(content)
+            except json.JSONDecodeError as e:
+                print(f"❌ JSON parsing failed: {e}")
+                # Try to extract JSON from the response if it's wrapped in text
+                import re
+                json_match = re.search(r'\{.*\}', content, re.DOTALL)
+                if json_match:
+                    try:
+                        result = json.loads(json_match.group())
+                        print("✅ Extracted JSON from wrapped response")
+                    except json.JSONDecodeError:
+                        return {
+                            'success': False,
+                            'error': f'Could not parse Vision API response as JSON: {e}'
+                        }
+                else:
+                    return {
+                        'success': False,
+                        'error': f'No JSON found in Vision API response: {content}'
+                    }
             
             return {
                 'success': True,

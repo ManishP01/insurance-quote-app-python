@@ -353,8 +353,10 @@ def upload_file():
                         'quote': quote,
                         'processing_method': 'openai_vision'
                     })
-            except ImportError:
-                print("Vision processor not available, trying fallback methods...")
+                else:
+                    print(f"Vision API failed: {vision_result.get('error', 'Unknown error')}")
+            except Exception as e:
+                print(f"Vision processor error: {e}")
             
             # Fallback to text extraction methods
             if filename.lower().endswith('.pdf'):
