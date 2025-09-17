@@ -20,6 +20,13 @@ class VisionDocumentProcessor:
         from dotenv import load_dotenv
         load_dotenv()
         
+        # Setup SSL bypass first
+        try:
+            from ssl_bypass import setup_ssl_bypass
+            setup_ssl_bypass()
+        except ImportError:
+            pass
+        
         api_key = os.getenv('OPENAI_API_KEY')
         self.openai_available = OPENAI_AVAILABLE and api_key and api_key.startswith('sk-')
         

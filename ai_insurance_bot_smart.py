@@ -21,31 +21,19 @@ class SmartAIInsuranceBot(AIInsuranceBot):
         from dotenv import load_dotenv
         load_dotenv()
         
+        # Setup SSL bypass first
+        try:
+            from ssl_bypass import setup_ssl_bypass
+            setup_ssl_bypass()
+        except ImportError:
+            pass
+        
         api_key = os.getenv('OPENAI_API_KEY')
         self.openai_available = OPENAI_AVAILABLE and api_key and api_key.startswith('sk-')
         
         if self.openai_available:
             openai.api_key = api_key
-            
-            # Handle SSL issues on corporate networks
-            disable_ssl = os.getenv('DISABLE_SSL_VERIFY', 'false').lower() == 'true'
-            if disable_ssl:
-                try:
-                    import urllib3
-                    urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
-                    
-                    # Set SSL context for corporate environments
-                    import ssl
-                    ssl_context = ssl.create_default_context()
-                    ssl_context.check_hostname = False
-                    ssl_context.verify_mode = ssl.CERT_NONE
-                    
-                    print("✅ Smart OpenAI Insurance Bot enabled (SSL verification disabled for corporate network)")
-                except Exception as ssl_error:
-                    print(f"⚠️ SSL configuration warning: {ssl_error}")
-                    print("✅ Smart OpenAI Insurance Bot enabled")
-            else:
-                print("✅ Smart OpenAI Insurance Bot enabled")
+            print("✅ Smart OpenAI Insurance Bot enabled")
         else:
             print("⚠️ Falling back to hardcoded patterns")
     

@@ -586,5 +586,5 @@ def agent_dashboard():
     return render_template('agent_dashboard.html')
 
 if __name__ == '__main__':
-    print(f"🚀 Starting InsureQuote Pro with {CHATBOT_TYPE or 'No'} chatbot...")
+    print(f"🚀 Starting PolicyPal Pro with {CHATBOT_TYPE or 'No'} chatbot...")
     app.run(debug=True, host='0.0.0.0', port=5000)
