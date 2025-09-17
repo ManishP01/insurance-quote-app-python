@@ -1,50 +1,39 @@
 """
-SSL Bypass for Corporate Networks
+SSL Configuration for Corporate Networks
+Supports both certificate bundle and SSL bypass approaches
 """
-
 import os
 import ssl
 import urllib3
 
-def setup_ssl_bypass():
-    """Setup SSL bypass for corporate networks"""
-    disable_ssl = os.getenv('DISABLE_SSL_VERIFY', 'false').lower() == 'true'
+def configure_ssl():
+    """Configure SSL settings for corporate networks"""
     
-    if disable_ssl:
-        try:
-            # Disable SSL warnings
-            urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
-            
-            # Create unverified SSL context globally
-            ssl._create_default_https_context = ssl._create_unverified_context
-            
-            # Monkey patch requests to ignore SSL
-            import requests
-            from requests.adapters import HTTPAdapter
-            from urllib3.util.retry import Retry
-            
-            class SSLAdapter(HTTPAdapter):
-                def init_poolmanager(self, *args, **kwargs):
-                    kwargs['ssl_context'] = ssl._create_unverified_context()
-                    return super().init_poolmanager(*args, **kwargs)
-            
-            # Apply to requests session
-            session = requests.Session()
-            session.mount('https://', SSLAdapter())
-            
-            # Patch OpenAI to use our session
-            try:
-                import openai
-                openai.api_requestor.requests = requests
-                openai.api_requestor.requests.Session = lambda: session
-            except:
-                pass
-            
-            print("🔓 SSL verification disabled for corporate network")
-            return True
-            
-        except Exception as e:
-            print(f"⚠️ SSL bypass setup failed: {e}")
-            return False
+    # Check if custom certificate bundle is provided
+    ca_bundle = os.getenv('REQUESTS_CA_BUNDLE')
+    if ca_bundle and os.path.exists(ca_bundle):
+        print(f"🔒 Using custom certificate bundle: {ca_bundle}")
+        # REQUESTS_CA_BUNDLE is automatically used by requests library
+        return
     
-    return False
+    # Fallback to SSL bypass if no certificate bundle
+    disable_ssl_verify = os.getenv('DISABLE_SSL_VERIFY', 'false').lower() == 'true'
+    
+    if disable_ssl_verify:
+        print("🔓 SSL verification disabled for corporate network")
+        
+        # Disable SSL warnings
+        urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+        
+        # Create unverified SSL context
+        ssl._create_default_https_context = ssl._create_unverified_context
+        
+        # Clear certificate bundle variables for bypass
+        os.environ['CURL_CA_BUNDLE'] = ''
+        if 'REQUESTS_CA_BUNDLE' not in os.environ or not os.path.exists(os.environ['REQUESTS_CA_BUNDLE']):
+            os.environ['REQUESTS_CA_BUNDLE'] = ''
+    else:
+        print("🔒 SSL verification enabled")
+
+# Auto-configure on import
+configure_ssl()
