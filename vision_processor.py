@@ -72,8 +72,11 @@ class VisionDocumentProcessor:
   "coverage_details": ["list of coverages found"],
   "deductible": "deductible amount",
   "effective_dates": "policy period",
+  "carrier": "insurance company name (look for company logos, letterhead, or company names like PolicyPal, State Farm, Allstate, etc.)",
   "confidence": 0.9
-}"""
+}
+
+Look specifically for insurance company branding, logos, or company names in headers/footers."""
                             },
                             {
                                 "type": "image_url",
