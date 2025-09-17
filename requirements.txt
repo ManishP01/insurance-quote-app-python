@@ -1,16 +1,27 @@
+# Core Web Framework
 Flask==2.3.3
 Flask-CORS==4.0.0
-PyPDF2==3.0.1
 Werkzeug==2.3.7
-python-multipart==0.0.6
 Jinja2==3.1.2
 gunicorn==21.2.0
-# OCR Dependencies
-pytesseract==0.3.10
-easyocr==1.7.0
-opencv-python==4.8.1.78
-Pillow==10.0.1
-PyMuPDF==1.23.8
-numpy==1.24.3
-# AI Translation
+
+# PDF Processing (for document upload)
+PyPDF2==3.0.1
+
+# Environment Variables
+python-dotenv==1.0.0
+
+# AI/OpenAI Integration
 openai==0.28.1
+
+# OCR Dependencies (only if using document OCR features)
+# Uncomment these if you need OCR functionality:
+# pytesseract==0.3.10
+# easyocr==1.7.0
+# opencv-python==4.8.1.78
+# Pillow==10.0.1
+# PyMuPDF==1.23.8
+# numpy==1.24.3
+
+# For creating sample documents (development only)
+# reportlab==4.0.4
