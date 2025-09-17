@@ -195,7 +195,12 @@ def analyze_policy_document(text):
 def calculate_quote_from_vision_data(vision_data: dict) -> dict:
     """Generate insurance quote from OpenAI Vision extracted data"""
     policy_type = vision_data.get('policy_type', 'Unknown')
-    current_premium = vision_data.get('premium_amount', 'Not found')
+    current_premium_str = vision_data.get('premium_amount', '$0')
+    
+    # Extract numeric value from current premium
+    import re
+    current_premium_match = re.search(r'[\d,]+', current_premium_str.replace('$', '').replace(',', ''))
+    current_premium = int(current_premium_match.group()) if current_premium_match else 2000
     
     # Generate competitive quote based on policy type
     if 'Auto' in policy_type:
@@ -211,15 +216,22 @@ def calculate_quote_from_vision_data(vision_data: dict) -> dict:
         quote_type = "Insurance"
         coverage_types = ['Basic Coverage']
     
+    # Calculate savings
+    savings = max(0, current_premium - base_quote)
+    savings_percent = round((savings / current_premium) * 100, 1) if current_premium > 0 else 0
+    
     return {
         'annual_premium': base_quote,
         'monthly_premium': round(base_quote / 12, 2),
         'policy_type': quote_type,
         'current_policy_info': {
             'type': policy_type,
-            'premium': current_premium
+            'premium': current_premium_str
         },
-        'savings_estimate': f"${random.randint(100, 500)}",
+        # Frontend expects these specific keys
+        'new_quote': base_quote,
+        'savings': savings,
+        'savings_percent': savings_percent,
         'confidence': vision_data.get('confidence', 0.8),
         'coverage_summary': coverage_types,
         'processing_method': 'openai_vision'
