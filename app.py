@@ -36,25 +36,25 @@ CHATBOT_TYPE = None
 chatbot = None
 
 try:
-    # Try GPT version first if API key is available
+    # Try Smart OpenAI approach if API key is available
     if os.getenv('OPENAI_API_KEY'):
-        from multilingual_chatbot_gpt import GPTMultilingualInsuranceChatbot
-        chatbot = GPTMultilingualInsuranceChatbot()
+        from ai_insurance_bot_smart import SmartAIInsuranceBot
+        chatbot = SmartAIInsuranceBot()
         CHATBOT_AVAILABLE = True
-        CHATBOT_TYPE = "GPT"
-        print("✅ GPT-powered multilingual chatbot loaded successfully")
+        CHATBOT_TYPE = "Smart OpenAI"
+        print("✅ Smart OpenAI multilingual chatbot loaded successfully")
     else:
-        raise Exception("No OpenAI API key found, falling back to keyword-based")
+        raise Exception("No OpenAI API key found, falling back to basic bot")
 except Exception as e:
-    print(f"⚠️  GPT chatbot not available: {e}")
+    print(f"⚠️ Smart OpenAI chatbot not available: {e}")
     try:
-        from multilingual_chatbot import MultilingualInsuranceChatbot
-        chatbot = MultilingualInsuranceChatbot()
+        from ai_insurance_bot import AIInsuranceBot
+        chatbot = AIInsuranceBot()
         CHATBOT_AVAILABLE = True
-        CHATBOT_TYPE = "Keyword"
-        print("✅ Keyword-based multilingual chatbot loaded as fallback")
+        CHATBOT_TYPE = "Basic"
+        print("✅ Basic insurance bot loaded as fallback")
     except ImportError as e2:
-        print(f"⚠️  No chatbot available: {e2}")
+        print(f"⚠️ No chatbot available: {e2}")
         CHATBOT_AVAILABLE = False
         CHATBOT_TYPE = None
 
