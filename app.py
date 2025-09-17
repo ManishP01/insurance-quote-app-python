@@ -12,15 +12,23 @@ from dotenv import load_dotenv
 # Load environment variables
 load_dotenv()
 
-# Import OCR processor
-try:
-    from ocr_processor_simple import InsuranceOCRSimple
-    OCR_AVAILABLE = True
-    print("✅ OCR processor loaded successfully")
-except ImportError as e:
-    print(f"⚠️  OCR not available: {e}")
-    print("📝 Install OCR dependencies: pip install easyocr opencv-python PyMuPDF")
-    OCR_AVAILABLE = False
+# OCR processor (lazy loading - only import when needed)
+OCR_AVAILABLE = False
+ocr_processor = None
+
+def get_ocr_processor():
+    """Lazy load OCR processor only when needed"""
+    global OCR_AVAILABLE, ocr_processor
+    if ocr_processor is None:
+        try:
+            from ocr_processor_simple import InsuranceOCRSimple
+            ocr_processor = InsuranceOCRSimple()
+            OCR_AVAILABLE = True
+            print("✅ OCR processor loaded successfully")
+        except ImportError as e:
+            print(f"⚠️ OCR not available: {e}")
+            OCR_AVAILABLE = False
+    return ocr_processor if OCR_AVAILABLE else None
 
 # Import multilingual chatbot with smart fallback
 CHATBOT_AVAILABLE = False
@@ -356,10 +364,11 @@ def upload_file():
                     return jsonify({'success': False, 'error': 'Could not extract text from PDF'})
             else:
                 # Image processing with OCR (if available)
-                if not OCR_AVAILABLE:
+                ocr_proc = get_ocr_processor()
+                if not ocr_proc:
                     return jsonify({'success': False, 'error': 'Image processing requires OCR libraries or OpenAI Vision API'})
                 
-                result = ocr_processor.process_document(temp_path)
+                result = ocr_proc.process_document(temp_path)
                 if not result['success']:
                     return jsonify({'success': False, 'error': result['error']})
                 

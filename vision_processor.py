@@ -119,7 +119,14 @@ class VisionDocumentProcessor:
     def process_pdf_with_vision(self, pdf_path: str) -> Dict:
         """Convert PDF to image and analyze with Vision"""
         try:
-            import fitz  # PyMuPDF
+            try:
+                import fitz  # PyMuPDF
+            except ImportError:
+                return {
+                    'success': False,
+                    'error': 'PyMuPDF not available for PDF processing. Install with: pip install PyMuPDF',
+                    'extracted_data': {}
+                }
             
             # Open PDF and convert first page to image
             doc = fitz.open(pdf_path)
